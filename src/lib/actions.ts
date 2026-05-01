@@ -43,24 +43,26 @@ export async function updateDiary(id: string, data: UpdateDiaryInput) {
   const parsed = UpdateDiarySchema.parse(data);
   const { images, ...entryData } = parsed;
 
-  if (images !== undefined) {
-    await prisma.diaryImage.deleteMany({
-      where: { entryId: id },
-    });
-  }
+  return prisma.$transaction(async (tx) => {
+    if (images !== undefined) {
+      await tx.diaryImage.deleteMany({
+        where: { entryId: id },
+      });
+    }
 
-  return prisma.diaryEntry.update({
-    where: { id },
-    data: {
-      ...entryData,
-      images:
-        images !== undefined
-          ? {
-              create: images.map((url) => ({ url })),
-            }
-          : undefined,
-    },
-    include: { images: true },
+    return tx.diaryEntry.update({
+      where: { id },
+      data: {
+        ...entryData,
+        images:
+          images !== undefined
+            ? {
+                create: images.map((url) => ({ url })),
+              }
+            : undefined,
+      },
+      include: { images: true },
+    });
   });
 }
 
