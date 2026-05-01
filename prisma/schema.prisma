@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model DiaryEntry {
+  id        String   @id @default(cuid())
+  date      DateTime
+  title     String?
+  content   String
+  mood      String   @default("sweet")
+  weather   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  images    DiaryImage[]
+}
+
+model DiaryImage {
+  id        String   @id @default(cuid())
+  url       String
+  entryId   String
+  entry     DiaryEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model CoupleProfile {
+  id              String   @id @default(cuid())
+  personAName     String
+  personBName     String
+  anniversaryDate DateTime
+  siteTitle       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
