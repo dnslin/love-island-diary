@@ -109,16 +109,19 @@ export async function getCoupleProfile() {
 
 export async function updateCoupleProfile(data: CoupleProfileInput) {
   const parsed = CoupleProfileSchema.parse(data);
-  const existing = await prisma.coupleProfile.findFirst();
 
-  if (existing) {
-    return prisma.coupleProfile.update({
-      where: { id: existing.id },
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.coupleProfile.findFirst();
+
+    if (existing) {
+      return tx.coupleProfile.update({
+        where: { id: existing.id },
+        data: parsed,
+      });
+    }
+
+    return tx.coupleProfile.create({
       data: parsed,
     });
-  }
-
-  return prisma.coupleProfile.create({
-    data: parsed,
   });
 }
