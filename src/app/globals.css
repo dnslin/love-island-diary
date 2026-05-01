@@ -8,6 +8,7 @@
   --color-text-main: #5B4B49;
   --color-text-sub: #8A7C78;
   --color-border-soft: #F1E4DD;
+  --font-body: var(--font-body);
 }
 
 body {

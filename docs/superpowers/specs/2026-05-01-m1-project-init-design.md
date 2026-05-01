@@ -17,7 +17,7 @@
 - 使用 `pnpm create next-app@latest` 创建 Next.js 14 项目（App Router + TypeScript + Tailwind CSS）
 - 配置 Tailwind CSS v4（CSS-first 配置，自定义奶油色系主题）
 - 接入 animal-island-ui 组件库
-- 加载霞鹜文楷字体（LXGW WenKai）用于标题/装饰文字
+- 加载 HYTiaoTiao 跳跳体作为正文字体
 - 配置全局样式（背景色 #FFF9F5、文字色 #5B4B49）
 - 建立项目目录结构（src/app、src/components、src/lib、prisma）
 
@@ -35,7 +35,7 @@
 2. 执行 `pnpm create next-app@latest .`（选项：App Router + TypeScript + Tailwind CSS + ESLint + `src/` 目录）
 3. 恢复原有文件，合并 `.gitignore`
 4. 安装 `animal-island-ui`：`pnpm add animal-island-ui`
-5. 安装霞鹜文楷字体包：`pnpm add @chinese-fonts/lxgwwenkai`
+5. 添加 HYTiaoTiao 跳跳体字体文件到 `src/app/fonts/`
 6. 配置 Tailwind v4 主题色和字体
 7. 验证：`pnpm dev` 正常启动
 
@@ -69,20 +69,20 @@ export default config;
 
 ### 3.3 字体加载方案
 
-通过 `@chinese-fonts/lxgwwenkai` npm 包 + `next/font/local` 本地加载霞鹜文楷字体，避免 FOUC（无样式内容闪烁）。
+通过 `next/font/local` 本地加载 HYTiaoTiao 跳跳体（657K），避免 FOUC（无样式内容闪烁）。
 
 在 `src/app/layout.tsx` 中配置：
 ```tsx
 import localFont from 'next/font/local';
 
-const lxgwWenKai = localFont({
-  src: '../node_modules/@chinese-fonts/lxgwwenkai/dist/LXGWWenKai-Regular/result.css',
-  variable: '--font-display',
+const hyTiaoTiao = localFont({
+  src: './fonts/HYTiaoTiao.ttf',
+  variable: '--font-body',
   display: 'swap',
 });
 ```
 
-若字体包体积过大导致构建问题，退而使用 CDN 子集加载 + `font-display: swap`，系统字体回退。
+字体加载失败时回退到系统字体栈：`PingFang SC`、`Microsoft YaHei`、sans-serif。
 
 ### 3.4 目录结构
 
@@ -110,7 +110,7 @@ const lxgwWenKai = localFont({
 ### 3.5 验证页内容
 
 `src/app/page.tsx` 作为验证页，包含：
-- 页面标题「恋爱小岛日记」，使用霞鹜文楷字体
+- 页面标题「恋爱小岛日记」，使用 HYTiaoTiao 跳跳体
 - 一个 animal-island-ui 的 Button 组件
 - 验证背景色 `#FFF9F5` 和文字色 `#5B4B49`
 
@@ -120,7 +120,7 @@ const lxgwWenKai = localFont({
 
 - [ ] `pnpm dev` 可以正常启动开发服务器
 - [ ] animal-island-ui Button 组件可以在页面中正常渲染
-- [ ] 霞鹜文楷字体正确加载，标题文字显示手写体
+- [ ] HYTiaoTiao 跳跳体正确加载，文字显示手写体
 - [ ] 页面背景色为 `#FFF9F5`，文字色为 `#5B4B49`
 - [ ] Tailwind CSS v4 自定义配置生效（颜色、字体变量可用）
 
@@ -140,6 +140,6 @@ const lxgwWenKai = localFont({
 |------|------|------|
 | 包管理器 | pnpm | BOSS 偏好，与 README 推荐一致 |
 | Tailwind 版本 | v4（CSS-first 配置） | 最新版本，配置更简洁，无需 tailwind.config.ts |
-| 字体加载 | npm 包 + next/font/local | 避免 FOUC，构建时打包 |
+| 字体加载 | 本地 TTF + next/font/local | 避免 FOUC，构建时自动优化子集 |
 | 项目创建位置 | 当前目录 | BOSS 明确要求 |
 | 现有文件处理 | 暂移备份后恢复 | 保留 Git 历史和设计文档 |
