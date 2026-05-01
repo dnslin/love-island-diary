@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "animal-island-ui/dist/index.css";
 import "./globals.css";
+
+const hyTiaoTiao = localFont({
+  src: "./fonts/HYTiaoTiao.ttf",
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "恋爱小岛日记",
@@ -13,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
-      <body className="antialiased">{children}</body>
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body className={`${hyTiaoTiao.variable} antialiased`}>{children}</body>
     </html>
   );
 }
