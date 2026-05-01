@@ -139,6 +139,17 @@ describe('Diary Actions', () => {
     expect(neighbors.prev).toBeNull();
     expect(neighbors.next).toBeNull();
   });
+
+  test('createDiary rejects content exceeding 10000 characters', async () => {
+    const longContent = 'a'.repeat(10001);
+    await expect(
+      createDiary({
+        date: new Date('2025-01-15'),
+        title: '超长内容测试',
+        content: longContent,
+      }),
+    ).rejects.toThrow();
+  });
 });
 
 describe('CoupleProfile Actions', () => {
