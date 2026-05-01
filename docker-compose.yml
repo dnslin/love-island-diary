@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: love-island-diary
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+    environment:
+      - DATABASE_URL=file:/data/love-diary.db
+    restart: unless-stopped
