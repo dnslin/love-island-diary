@@ -4,8 +4,10 @@ import { prisma } from './prisma';
 import {
   CreateDiarySchema,
   UpdateDiarySchema,
+  CoupleProfileSchema,
   type CreateDiaryInput,
   type UpdateDiaryInput,
+  type CoupleProfileInput,
 } from './schemas';
 
 export async function createDiary(data: CreateDiaryInput) {
@@ -99,4 +101,24 @@ export async function getDiaryNeighbors(id: string) {
     prev: prevEntry?.id ?? null,
     next: nextEntry?.id ?? null,
   };
+}
+
+export async function getCoupleProfile() {
+  return prisma.coupleProfile.findFirst();
+}
+
+export async function updateCoupleProfile(data: CoupleProfileInput) {
+  const parsed = CoupleProfileSchema.parse(data);
+  const existing = await prisma.coupleProfile.findFirst();
+
+  if (existing) {
+    return prisma.coupleProfile.update({
+      where: { id: existing.id },
+      data: parsed,
+    });
+  }
+
+  return prisma.coupleProfile.create({
+    data: parsed,
+  });
 }
