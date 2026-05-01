@@ -56,6 +56,7 @@ export default function Home() {
           closable
           footer={null}
           width={320}
+          typewriter={false}
         >
           <div className="flex flex-col items-center gap-4 py-4 text-center">
             <span className="text-2xl">❤</span>
