@@ -1,0 +1,32 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# Next.js 构建产物
+.next/
+out/
+
+# 开发数据库（生产环境通过 Volume 挂载）
+prisma/dev.db
+prisma/dev.db-journal
+
+# 环境文件（通过 Dockerfile ENV 或 docker-compose 注入）
+.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# 开发工具配置
+.superpowers/
+docs/
+*.md
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# 系统文件
+.DS_Store
