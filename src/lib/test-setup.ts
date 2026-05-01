@@ -1,2 +1,5 @@
-// Jest 全局测试设置占位文件
-// 完整实现将在后续任务中添加
+import { prisma } from './prisma';
+
+afterAll(async () => {
+  await prisma.$disconnect();
+});
