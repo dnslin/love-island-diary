@@ -97,6 +97,23 @@ describe('Diary Actions', () => {
     expect(updated.images[0].url).toBe('https://example.com/keep.jpg');
   });
 
+  test('updateDiary clears images when empty array provided', async () => {
+    const created = await createDiary({
+      date: new Date('2025-01-15'),
+      title: '标题',
+      content: '内容',
+      images: ['https://example.com/clear.jpg'],
+    });
+
+    const updated = await updateDiary(created.id, {
+      title: '新标题',
+      images: [],
+    });
+
+    expect(updated.title).toBe('新标题');
+    expect(updated.images).toHaveLength(0);
+  });
+
   test('deleteDiary removes diary and cascades images', async () => {
     const created = await createDiary({
       date: new Date('2025-01-15'),

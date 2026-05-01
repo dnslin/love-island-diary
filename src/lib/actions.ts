@@ -77,7 +77,7 @@ export async function deleteDiary(id: string) {
 export async function getDiaryNeighbors(id: string) {
   const current = await prisma.diaryEntry.findUnique({
     where: { id },
-    select: { date: true },
+    select: { date: true, createdAt: true },
   });
 
   if (!current) {
@@ -86,13 +86,33 @@ export async function getDiaryNeighbors(id: string) {
 
   const [prevEntry, nextEntry] = await Promise.all([
     prisma.diaryEntry.findFirst({
-      where: { date: { lt: current.date } },
-      orderBy: { date: 'desc' },
+      where: {
+        OR: [
+          { date: { lt: current.date } },
+          {
+            AND: [
+              { date: { equals: current.date } },
+              { createdAt: { lt: current.createdAt } },
+            ],
+          },
+        ],
+      },
+      orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
       select: { id: true },
     }),
     prisma.diaryEntry.findFirst({
-      where: { date: { gt: current.date } },
-      orderBy: { date: 'asc' },
+      where: {
+        OR: [
+          { date: { gt: current.date } },
+          {
+            AND: [
+              { date: { equals: current.date } },
+              { createdAt: { gt: current.createdAt } },
+            ],
+          },
+        ],
+      },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
       select: { id: true },
     }),
   ]);
@@ -110,18 +130,9 @@ export async function getCoupleProfile() {
 export async function updateCoupleProfile(data: CoupleProfileInput) {
   const parsed = CoupleProfileSchema.parse(data);
 
-  return prisma.$transaction(async (tx) => {
-    const existing = await tx.coupleProfile.findFirst();
-
-    if (existing) {
-      return tx.coupleProfile.update({
-        where: { id: existing.id },
-        data: parsed,
-      });
-    }
-
-    return tx.coupleProfile.create({
-      data: parsed,
-    });
+  return prisma.coupleProfile.upsert({
+    where: { id: 'profile' },
+    update: parsed,
+    create: { ...parsed, id: 'profile' },
   });
 }
