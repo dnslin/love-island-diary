@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #FFF9F5;
+  --color-card: #FFFFFF;
+  --color-primary: #F7C8D0;
+  --color-accent: #E8AEB7;
+  --color-text-main: #5B4B49;
+  --color-text-sub: #8A7C78;
+  --color-border-soft: #F1E4DD;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-text-main);
+}
