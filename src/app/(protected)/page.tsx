@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { getCoupleProfile, getCoverStats } from '@/lib/actions';
@@ -6,6 +7,13 @@ import AnimatedDays from '@/components/AnimatedDays';
 import FloatingButton from '@/components/FloatingButton';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getCoupleProfile();
+  return {
+    title: profile?.siteTitle ?? '恋爱小岛日记',
+  };
+}
 
 export default async function Home() {
   const [profile, stats] = await Promise.all([
