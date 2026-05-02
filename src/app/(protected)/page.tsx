@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import dayjs from 'dayjs';
 import { getCoupleProfile, getCoverStats } from '@/lib/actions';
 import CoverLogo from '@/components/CoverLogo';
@@ -14,8 +13,9 @@ export default async function Home() {
     getCoverStats(),
   ]);
 
+  // layout 守卫已确保 profile 存在
   if (!profile) {
-    redirect('/settings');
+    return null;
   }
 
   const days = dayjs().diff(dayjs(profile.anniversaryDate), 'day');
