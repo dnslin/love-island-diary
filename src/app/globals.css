@@ -9,6 +9,18 @@
   --color-text-sub: #8A7C78;
   --color-border-soft: #F1E4DD;
   --font-body: var(--font-body);
+  --animate-float: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(247, 200, 208, 0.35);
+  }
+  50% {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(247, 200, 208, 0.25);
+  }
 }
 
 body {
