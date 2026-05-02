@@ -9,7 +9,18 @@ import {
   getCoupleProfile,
   updateCoupleProfile,
   getCoverStats,
+  saveCoupleProfileAction,
 } from '../actions';
+import dayjs from 'dayjs';
+
+jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
+jest.mock('next/navigation', () => ({
+  redirect: (url: string) => {
+    const err = new Error(`NEXT_REDIRECT:${url}`);
+    (err as Error & { digest?: string }).digest = `NEXT_REDIRECT;replace;${url};307;`;
+    throw err;
+  },
+}));
 
 beforeEach(async () => {
   await prisma.diaryImage.deleteMany();
@@ -234,5 +245,20 @@ describe('Cover Stats', () => {
     const stats = await getCoverStats();
     expect(stats.diaryCount).toBe(2);
     expect(stats.memoryCount).toBe(2);
+  });
+});
+
+describe('saveCoupleProfileAction', () => {
+  test('拒绝未来日期', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '小兔子');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', dayjs().add(1, 'day').format('YYYY-MM-DD'));
+    fd.set('siteTitle', '');
+
+    const state = await saveCoupleProfileAction({ ok: true }, fd);
+
+    expect(state.ok).toBe(false);
+    expect(state.fieldErrors?.anniversaryDate).toBe('在一起日期不能晚于今天');
   });
 });

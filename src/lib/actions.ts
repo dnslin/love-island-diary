@@ -9,6 +9,9 @@ import {
   type UpdateDiaryInput,
   type CoupleProfileInput,
 } from './schemas';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
 
 export async function createDiary(data: CreateDiaryInput) {
   const parsed = CreateDiarySchema.parse(data);
@@ -143,4 +146,76 @@ export async function getCoverStats() {
     prisma.diaryImage.count(),
   ]);
   return { diaryCount, memoryCount };
+}
+
+export type SettingsFormState = {
+  ok: boolean;
+  fieldErrors?: Partial<
+    Record<'personAName' | 'personBName' | 'anniversaryDate' | 'siteTitle', string>
+  >;
+  formError?: string;
+};
+
+const SettingsActionSchema = z.object({
+  personAName: z
+    .string()
+    .trim()
+    .min(1, '请填写第一位的昵称')
+    .max(50, '不超过 50 字'),
+  personBName: z
+    .string()
+    .trim()
+    .min(1, '请填写第二位的昵称')
+    .max(50, '不超过 50 字'),
+  anniversaryDate: z.coerce
+    .date({ error: '请选择日期' })
+    .refine((d) => d.getTime() <= Date.now(), '在一起日期不能晚于今天'),
+  siteTitle: z.string().trim().max(100, '不超过 100 字').optional(),
+});
+
+function zodIssuesToFieldErrors(
+  error: z.ZodError,
+): SettingsFormState['fieldErrors'] {
+  const fieldErrors: SettingsFormState['fieldErrors'] = {};
+  for (const issue of error.issues) {
+    const key = issue.path[0];
+    if (
+      typeof key === 'string' &&
+      ['personAName', 'personBName', 'anniversaryDate', 'siteTitle'].includes(key)
+    ) {
+      const k = key as keyof NonNullable<SettingsFormState['fieldErrors']>;
+      if (!fieldErrors[k]) fieldErrors[k] = issue.message;
+    }
+  }
+  return fieldErrors;
+}
+
+export async function saveCoupleProfileAction(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  const parsed = SettingsActionSchema.safeParse({
+    personAName: formData.get('personAName'),
+    personBName: formData.get('personBName'),
+    anniversaryDate: formData.get('anniversaryDate'),
+    siteTitle: formData.get('siteTitle'),
+  });
+
+  if (!parsed.success) {
+    return { ok: false, fieldErrors: zodIssuesToFieldErrors(parsed.error) };
+  }
+
+  const data = {
+    ...parsed.data,
+    siteTitle: parsed.data.siteTitle?.length ? parsed.data.siteTitle : undefined,
+  };
+
+  try {
+    await updateCoupleProfile(data);
+  } catch {
+    return { ok: false, formError: '保存失败,请稍后重试' };
+  }
+
+  revalidatePath('/');
+  redirect('/');
 }
