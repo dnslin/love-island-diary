@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSpring, useTransform, motion } from 'framer-motion';
 
 interface AnimatedDaysProps {
@@ -15,6 +15,7 @@ export default function AnimatedDays({ days }: AnimatedDaysProps) {
   );
   const spring = useSpring(0, { duration: 1500 });
   const display = useTransform(spring, (v) => Math.round(v));
+  const prevDaysRef = useRef(days);
 
   useEffect(() => {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -24,9 +25,10 @@ export default function AnimatedDays({ days }: AnimatedDaysProps) {
   }, []);
 
   useEffect(() => {
-    if (!prefersReducedMotion) {
+    if (!prefersReducedMotion && prevDaysRef.current !== days) {
       spring.set(0);
       spring.set(days);
+      prevDaysRef.current = days;
     }
     return () => {
       spring.stop();
