@@ -15,7 +15,7 @@ export default function AnimatedDays({ days }: AnimatedDaysProps) {
   );
   const spring = useSpring(0, { duration: 1500 });
   const display = useTransform(spring, (v) => Math.round(v));
-  const prevDaysRef = useRef(days);
+  const prevDaysRef = useRef<number | null>(null);
 
   useEffect(() => {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');

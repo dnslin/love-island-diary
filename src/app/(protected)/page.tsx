@@ -52,7 +52,7 @@ export default async function Home() {
 
         {/* 标题 */}
         <div className="absolute top-16 left-16 text-[10px] text-text-sub tracking-[3px]">
-          恋爱小岛日记
+          {profile.siteTitle ?? '恋爱小岛日记'}
         </div>
 
         {/* 昵称卡片 */}
