@@ -274,4 +274,36 @@ describe('saveCoupleProfileAction', () => {
     expect(state.ok).toBe(false);
     expect(state.fieldErrors?.personAName).toBe('请填写第一位的昵称');
   });
+
+  test('成功路径写入 profile 并 redirect 到 /', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '小兔子');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', '2024-07-18');
+    fd.set('siteTitle', '恋爱小岛日记');
+
+    await expect(
+      saveCoupleProfileAction({ ok: true }, fd),
+    ).rejects.toThrow('NEXT_REDIRECT:/');
+
+    const profile = await prisma.coupleProfile.findFirst();
+    expect(profile?.personAName).toBe('小兔子');
+    expect(profile?.personBName).toBe('大灰狼');
+    expect(profile?.siteTitle).toBe('恋爱小岛日记');
+  });
+
+  test('成功路径下空白 siteTitle 归一化为 null', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '小兔子');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', '2024-07-18');
+    fd.set('siteTitle', '   ');
+
+    await expect(
+      saveCoupleProfileAction({ ok: true }, fd),
+    ).rejects.toThrow('NEXT_REDIRECT:/');
+
+    const profile = await prisma.coupleProfile.findFirst();
+    expect(profile?.siteTitle).toBeNull();
+  });
 });
