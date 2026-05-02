@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import dayjs from 'dayjs';
 import { getCoupleProfile, getCoverStats } from '@/lib/actions';
 import CoverLogo from '@/components/CoverLogo';
@@ -14,8 +13,9 @@ export default async function Home() {
     getCoverStats(),
   ]);
 
+  // layout 守卫已确保 profile 存在;保留类型收窄
   if (!profile) {
-    redirect('/settings');
+    return null;
   }
 
   const days = dayjs().diff(dayjs(profile.anniversaryDate), 'day');
@@ -52,7 +52,7 @@ export default async function Home() {
 
         {/* 标题 */}
         <div className="absolute top-16 left-16 text-[10px] text-text-sub tracking-[3px]">
-          恋爱小岛日记
+          {profile.siteTitle ?? '恋爱小岛日记'}
         </div>
 
         {/* 昵称卡片 */}

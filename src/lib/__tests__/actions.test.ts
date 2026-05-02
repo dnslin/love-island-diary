@@ -9,7 +9,18 @@ import {
   getCoupleProfile,
   updateCoupleProfile,
   getCoverStats,
+  saveCoupleProfileAction,
 } from '../actions';
+import dayjs from 'dayjs';
+
+jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
+jest.mock('next/navigation', () => ({
+  redirect: (url: string) => {
+    const err = new Error(`NEXT_REDIRECT:${url}`);
+    (err as Error & { digest?: string }).digest = `NEXT_REDIRECT;replace;${url};307;`;
+    throw err;
+  },
+}));
 
 beforeEach(async () => {
   await prisma.diaryImage.deleteMany();
@@ -234,5 +245,65 @@ describe('Cover Stats', () => {
     const stats = await getCoverStats();
     expect(stats.diaryCount).toBe(2);
     expect(stats.memoryCount).toBe(2);
+  });
+});
+
+describe('saveCoupleProfileAction', () => {
+  test('拒绝未来日期', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '小兔子');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', dayjs().add(1, 'day').format('YYYY-MM-DD'));
+    fd.set('siteTitle', '');
+
+    const state = await saveCoupleProfileAction({ ok: true }, fd);
+
+    expect(state.ok).toBe(false);
+    expect(state.fieldErrors?.anniversaryDate).toBe('在一起日期不能晚于今天');
+  });
+
+  test('拒绝空白姓名(trim 后为空)', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '   ');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', '2024-07-18');
+    fd.set('siteTitle', '');
+
+    const state = await saveCoupleProfileAction({ ok: true }, fd);
+
+    expect(state.ok).toBe(false);
+    expect(state.fieldErrors?.personAName).toBe('请填写第一位的昵称');
+  });
+
+  test('成功路径写入 profile 并 redirect 到 /', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '小兔子');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', '2024-07-18');
+    fd.set('siteTitle', '恋爱小岛日记');
+
+    await expect(
+      saveCoupleProfileAction({ ok: true }, fd),
+    ).rejects.toThrow('NEXT_REDIRECT:/');
+
+    const profile = await prisma.coupleProfile.findFirst();
+    expect(profile?.personAName).toBe('小兔子');
+    expect(profile?.personBName).toBe('大灰狼');
+    expect(profile?.siteTitle).toBe('恋爱小岛日记');
+  });
+
+  test('成功路径下空白 siteTitle 归一化为 null', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '小兔子');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', '2024-07-18');
+    fd.set('siteTitle', '   ');
+
+    await expect(
+      saveCoupleProfileAction({ ok: true }, fd),
+    ).rejects.toThrow('NEXT_REDIRECT:/');
+
+    const profile = await prisma.coupleProfile.findFirst();
+    expect(profile?.siteTitle).toBeNull();
   });
 });

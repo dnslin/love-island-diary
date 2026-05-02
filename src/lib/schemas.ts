@@ -18,7 +18,7 @@ export const CoupleProfileSchema = z.object({
   personAName: z.string().min(1).max(50),
   personBName: z.string().min(1).max(50),
   anniversaryDate: z.coerce.date(),
-  siteTitle: z.string().max(100).optional(),
+  siteTitle: z.string().max(100).nullable().optional(),
 });
 
 export type CoupleProfileInput = z.infer<typeof CoupleProfileSchema>;
