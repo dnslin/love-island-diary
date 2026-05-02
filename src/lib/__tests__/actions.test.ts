@@ -261,4 +261,17 @@ describe('saveCoupleProfileAction', () => {
     expect(state.ok).toBe(false);
     expect(state.fieldErrors?.anniversaryDate).toBe('在一起日期不能晚于今天');
   });
+
+  test('拒绝空白姓名(trim 后为空)', async () => {
+    const fd = new FormData();
+    fd.set('personAName', '   ');
+    fd.set('personBName', '大灰狼');
+    fd.set('anniversaryDate', '2024-07-18');
+    fd.set('siteTitle', '');
+
+    const state = await saveCoupleProfileAction({ ok: true }, fd);
+
+    expect(state.ok).toBe(false);
+    expect(state.fieldErrors?.personAName).toBe('请填写第一位的昵称');
+  });
 });
