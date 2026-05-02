@@ -12,6 +12,7 @@ import {
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import dayjs from 'dayjs';
 
 export async function createDiary(data: CreateDiaryInput) {
   const parsed = CreateDiarySchema.parse(data);
@@ -169,8 +170,17 @@ const SettingsActionSchema = z.object({
     .max(50, '不超过 50 字'),
   anniversaryDate: z.coerce
     .date({ error: '请选择日期' })
-    .refine((d) => d.getTime() <= Date.now(), '在一起日期不能晚于今天'),
-  siteTitle: z.string().trim().max(100, '不超过 100 字').optional(),
+    .refine(
+      (d) =>
+        dayjs(d).startOf('day').valueOf() <= dayjs().endOf('day').valueOf(),
+      '在一起日期不能晚于今天',
+    ),
+  siteTitle: z
+    .string()
+    .trim()
+    .max(100, '不超过 100 字')
+    .transform((v) => (v.length ? v : null))
+    .optional(),
 });
 
 function zodIssuesToFieldErrors(
@@ -205,13 +215,8 @@ export async function saveCoupleProfileAction(
     return { ok: false, fieldErrors: zodIssuesToFieldErrors(parsed.error) };
   }
 
-  const data = {
-    ...parsed.data,
-    siteTitle: parsed.data.siteTitle?.length ? parsed.data.siteTitle : undefined,
-  };
-
   try {
-    await updateCoupleProfile(data);
+    await updateCoupleProfile(parsed.data);
   } catch {
     return { ok: false, formError: '保存失败,请稍后重试' };
   }
