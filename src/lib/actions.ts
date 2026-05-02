@@ -136,3 +136,11 @@ export async function updateCoupleProfile(data: CoupleProfileInput) {
     create: { ...parsed, id: 'profile' },
   });
 }
+
+export async function getCoverStats() {
+  const [diaryCount, memoryCount] = await Promise.all([
+    prisma.diaryEntry.count(),
+    prisma.diaryImage.count(),
+  ]);
+  return { diaryCount, memoryCount };
+}

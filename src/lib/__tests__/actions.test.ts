@@ -8,6 +8,7 @@ import {
   getDiaryNeighbors,
   getCoupleProfile,
   updateCoupleProfile,
+  getCoverStats,
 } from '../actions';
 
 beforeEach(async () => {
@@ -207,5 +208,31 @@ describe('CoupleProfile Actions', () => {
 
     const count = await prisma.coupleProfile.count();
     expect(count).toBe(1);
+  });
+});
+
+describe('Cover Stats', () => {
+  test('getCoverStats returns zero counts when empty', async () => {
+    const stats = await getCoverStats();
+    expect(stats.diaryCount).toBe(0);
+    expect(stats.memoryCount).toBe(0);
+  });
+
+  test('getCoverStats returns correct counts', async () => {
+    await createDiary({
+      date: new Date('2025-01-15'),
+      title: '第一篇',
+      content: '内容',
+      images: ['https://example.com/1.jpg', 'https://example.com/2.jpg'],
+    });
+    await createDiary({
+      date: new Date('2025-01-16'),
+      title: '第二篇',
+      content: '内容',
+    });
+
+    const stats = await getCoverStats();
+    expect(stats.diaryCount).toBe(2);
+    expect(stats.memoryCount).toBe(2);
   });
 });
