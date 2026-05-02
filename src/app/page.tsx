@@ -6,6 +6,8 @@ import CoverLogo from '@/components/CoverLogo';
 import AnimatedDays from '@/components/AnimatedDays';
 import FloatingButton from '@/components/FloatingButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const [profile, stats] = await Promise.all([
     getCoupleProfile(),
@@ -21,7 +23,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-cream px-4 relative">
-      <div className="mx-auto max-w-120 min-h-screen relative">
+      <div className="mx-auto max-w-[480px] min-h-screen relative">
         {/* 设置按钮 */}
         <Link
           href="/settings"
