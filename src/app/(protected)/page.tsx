@@ -13,7 +13,7 @@ export default async function Home() {
     getCoverStats(),
   ]);
 
-  // layout 守卫已确保 profile 存在
+  // layout 守卫已确保 profile 存在;保留类型收窄
   if (!profile) {
     return null;
   }
