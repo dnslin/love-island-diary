@@ -1,23 +1,88 @@
-"use client";
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import dayjs from 'dayjs';
+import { getCoupleProfile, getCoverStats } from '@/lib/actions';
+import CoverLogo from '@/components/CoverLogo';
+import AnimatedDays from '@/components/AnimatedDays';
+import FloatingButton from '@/components/FloatingButton';
 
-import { Button } from "animal-island-ui";
-import CoverLogo from "@/components/CoverLogo";
+export default async function Home() {
+  const [profile, stats] = await Promise.all([
+    getCoupleProfile(),
+    getCoverStats(),
+  ]);
 
-export default function Home() {
+  if (!profile) {
+    redirect('/settings');
+  }
+
+  const days = dayjs().diff(dayjs(profile.anniversaryDate), 'day');
+  const formattedDate = dayjs(profile.anniversaryDate).format('YYYY.MM.DD');
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-cream px-4">
-      <main className="flex flex-col items-center gap-8 text-center">
-        <CoverLogo />
-        <h1 className="text-4xl font-bold text-text-main">
+    <div className="min-h-screen bg-cream px-4 relative">
+      <div className="mx-auto max-w-120 min-h-screen relative">
+        {/* 设置按钮 */}
+        <Link
+          href="/settings"
+          className="absolute top-4 right-0 p-2 text-text-sub hover:text-text-main transition-colors"
+          aria-label="设置"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </Link>
+
+        {/* Logo */}
+        <div className="absolute top-14 left-2">
+          <CoverLogo />
+        </div>
+
+        {/* 标题 */}
+        <div className="absolute top-16 left-16 text-[10px] text-text-sub tracking-[3px]">
           恋爱小岛日记
-        </h1>
-        <p className="text-lg text-text-sub">
-          一个私密、温柔、治愈的恋爱日记网站
-        </p>
-        <Button type="primary" size="middle">
-          翻开日记
-        </Button>
-      </main>
+        </div>
+
+        {/* 昵称卡片 */}
+        <div className="absolute top-30 left-2 -rotate-2">
+          <div className="bg-card border border-border-soft rounded-xl px-5 py-3 shadow-sm">
+            <div className="text-[15px] font-bold text-text-main">
+              {profile.personAName}{' '}
+              <span className="text-accent">&</span>{' '}
+              {profile.personBName}
+            </div>
+            <div className="text-[9px] text-text-sub mt-1">
+              {formattedDate} — 至今
+            </div>
+          </div>
+        </div>
+
+        {/* 天数 */}
+        <div className="absolute top-50 right-6 text-right">
+          <AnimatedDays days={days} />
+          <div className="text-[11px] text-text-sub mt-1">天</div>
+        </div>
+
+        {/* 按钮 */}
+        <div className="absolute bottom-25 left-1/2 -translate-x-1/2">
+          <FloatingButton href="/diary">翻开日记</FloatingButton>
+        </div>
+
+        {/* 统计 */}
+        <div className="absolute bottom-6 right-6 text-[10px] text-text-sub">
+          日记 {stats.diaryCount} · 回忆 {stats.memoryCount}
+        </div>
+      </div>
     </div>
   );
 }
