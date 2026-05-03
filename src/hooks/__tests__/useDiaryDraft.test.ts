@@ -45,7 +45,7 @@ describe('useDiaryDraft', () => {
     expect(result.current[0]).toEqual({ content: 'restored' });
   });
 
-  test('clearDraft 清除 localStorage', () => {
+  test('clearDraft 清除 localStorage 并同步 state', () => {
     localStorage.setItem('diary-draft', JSON.stringify({ content: 'hello' }));
 
     const { result } = renderHook(() =>
@@ -57,5 +57,6 @@ describe('useDiaryDraft', () => {
     });
 
     expect(localStorage.getItem('diary-draft')).toBeNull();
+    expect(result.current[0]).toEqual({ content: '' });
   });
 });

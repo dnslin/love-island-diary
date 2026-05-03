@@ -28,6 +28,7 @@ export function useDiaryDraft<T>(key: string, defaultValue: T) {
   const clearDraft = () => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(key);
+    setDraft(defaultValue);
   };
 
   return [draft, setDraft, clearDraft] as const;
