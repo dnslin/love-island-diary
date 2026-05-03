@@ -1,25 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useDiaryDraft<T>(key: string, defaultValue: T) {
-  const [draft, setDraft] = useState<T>(defaultValue);
-  const defaultValueRef = useRef(defaultValue);
-
-  // 保持 defaultValueRef 始终最新
-  defaultValueRef.current = defaultValue;
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  const [draft, setDraft] = useState<T>(() => {
+    if (typeof window === 'undefined') return defaultValue;
     const saved = localStorage.getItem(key);
     if (saved) {
       try {
-        setDraft(JSON.parse(saved));
+        return JSON.parse(saved);
       } catch {
         localStorage.removeItem(key);
       }
     }
-  }, [key]);
+    return defaultValue;
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -32,7 +27,7 @@ export function useDiaryDraft<T>(key: string, defaultValue: T) {
   const clearDraft = () => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(key);
-    setDraft(defaultValueRef.current);
+    setDraft(defaultValue);
   };
 
   return [draft, setDraft, clearDraft] as const;
