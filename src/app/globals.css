@@ -28,3 +28,10 @@ body {
   color: var(--color-text-main);
   font-family: var(--font-body), "PingFang SC", "Microsoft YaHei", sans-serif;
 }
+
+/* 输入框聚焦边框统一为 animal-island-ui 焦点黄 */
+input:focus,
+textarea:focus {
+  border-color: #ffcc00 !important;
+  outline: none;
+}

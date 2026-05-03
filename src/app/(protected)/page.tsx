@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import dayjs from 'dayjs';
-import { getCoupleProfile, getCoverStats } from '@/lib/actions';
+import { getCoupleProfile, getCoverStats, getDiaryList } from '@/lib/actions';
 import CoverLogo from '@/components/CoverLogo';
 import AnimatedDays from '@/components/AnimatedDays';
 import FloatingButton from '@/components/FloatingButton';
+import SecretWriteEntry from '@/components/SecretWriteEntry';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,10 +17,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [profile, stats] = await Promise.all([
+  const [profile, stats, diaries] = await Promise.all([
     getCoupleProfile(),
     getCoverStats(),
+    getDiaryList(),
   ]);
+
+  const latestDiary = diaries[0] ?? null;
 
   // layout 守卫已确保 profile 存在;保留类型收窄
   if (!profile) {
@@ -179,13 +183,17 @@ export default async function Home() {
 
         {/* 按钮 */}
         <div className="absolute bottom-32 left-1/2 -translate-x-1/2">
-          <FloatingButton href="/diary">翻开日记</FloatingButton>
+          <FloatingButton href={latestDiary ? `/diary/${latestDiary.id}` : '/diary/new'}>
+            {latestDiary ? '翻开日记' : '写下第一篇'}
+          </FloatingButton>
         </div>
 
-        {/* 统计 */}
-        <div className="absolute bottom-6 right-6 text-[10px] text-text-sub">
-          日记 {stats.diaryCount} · 回忆 {stats.memoryCount}
-        </div>
+        {/* 统计 — 连续点击3次进入写日记（隐蔽入口） */}
+        <SecretWriteEntry>
+          <div className="absolute bottom-6 right-6 text-[10px] text-text-sub">
+            日记 {stats.diaryCount} · 回忆 {stats.memoryCount}
+          </div>
+        </SecretWriteEntry>
       </div>
     </div>
   );
