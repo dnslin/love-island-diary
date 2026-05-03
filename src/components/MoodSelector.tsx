@@ -54,8 +54,14 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
         <motion.span
           className="w-3 h-3 rounded-full"
           style={{ backgroundColor: selected.color }}
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+          animate={{ scale: 1.3 }}
+          transition={{
+            type: 'spring',
+            stiffness: 300,
+            damping: 10,
+            repeat: 1,
+            repeatType: 'reverse',
+          }}
           key={selected.value}
         />
         <span className="text-sm text-text-main">{selected.label}</span>
