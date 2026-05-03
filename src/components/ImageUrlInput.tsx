@@ -31,7 +31,7 @@ export function ImageUrlInput({ urls, onChange }: ImageUrlInputProps) {
   return (
     <div className="space-y-2">
       {urls.map((url, index) => (
-        <div key={`${url}-${index}`} className="flex items-center gap-2">
+        <div key={index} className="flex items-center gap-2">
           <span className="flex-1 text-sm text-text-sub truncate">{url}</span>
           <button
             type="button"
@@ -50,6 +50,12 @@ export function ImageUrlInput({ urls, onChange }: ImageUrlInputProps) {
           onChange={(e) => {
             setInput(e.target.value);
             if (error) setError('');
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              addUrl();
+            }
           }}
           placeholder="粘贴图片链接"
           className="flex-1 px-3 py-2 rounded-lg border border-border-soft bg-card text-sm"
