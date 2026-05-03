@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { createDiary } from '@/lib/actions';
@@ -34,6 +34,15 @@ export function DiaryForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   const updateField = useCallback(
     <K extends keyof DiaryFormData>(key: K, value: DiaryFormData[K]) => {
@@ -42,7 +51,7 @@ export function DiaryForm() {
     [setForm],
   );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setError('');
     setSuccess(false);
 
@@ -63,15 +72,16 @@ export function DiaryForm() {
       });
       clearDraft();
       setSuccess(true);
-      setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         router.push(`/diary/${entry.id}`);
       }, 1500);
-    } catch {
+    } catch (err) {
+      console.error('保存日记失败:', err);
       setError('保存失败，请稍后重试');
     } finally {
       setSaving(false);
     }
-  };
+  }, [form, router, clearDraft]);
 
   return (
     <div className="space-y-4">
