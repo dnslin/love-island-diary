@@ -45,7 +45,10 @@ export function DiaryTimeline({ groups }: DiaryTimelineProps) {
       {Array.from(groups.entries()).map(([monthKey, entries]) => (
         <section key={monthKey} className="relative pl-6">
           <h2 className="sticky top-0 bg-cream/95 backdrop-blur z-10 py-2 text-sm font-bold text-text-main">
-            {dayjs(monthKey).format('YYYY年M月')}
+            {(() => {
+              const [year, month] = monthKey.split('-');
+              return `${year} 年 ${parseInt(month, 10)} 月`;
+            })()}
           </h2>
           <div className="absolute left-[7px] top-10 bottom-0 w-px bg-border-soft" />
           <ul className="space-y-3 py-2">

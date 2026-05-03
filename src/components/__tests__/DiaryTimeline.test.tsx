@@ -50,7 +50,7 @@ describe('DiaryTimeline', () => {
 
     render(<DiaryTimeline groups={groups} />);
 
-    expect(screen.getByRole('heading', { name: '2025年1月' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '2025 年 1 月' })).toBeInTheDocument();
     expect(screen.getByText('1月15日 星期三')).toBeInTheDocument();
     expect(screen.getByText('Test Title')).toBeInTheDocument();
   });
@@ -74,8 +74,8 @@ describe('DiaryTimeline', () => {
     render(<DiaryTimeline groups={groups} />);
 
     const headings = screen.getAllByRole('heading');
-    expect(headings[0]).toHaveTextContent('2025年2月');
-    expect(headings[1]).toHaveTextContent('2025年1月');
+    expect(headings[0]).toHaveTextContent('2025 年 2 月');
+    expect(headings[1]).toHaveTextContent('2025 年 1 月');
   });
 
   test('renders multiple entries within same month', () => {
