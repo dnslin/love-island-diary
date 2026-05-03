@@ -40,7 +40,7 @@ export async function getDiaryById(id: string) {
 
 export async function getDiaryList() {
   return prisma.diaryEntry.findMany({
-    orderBy: { date: 'desc' },
+    orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
     include: { images: true },
   });
 }
