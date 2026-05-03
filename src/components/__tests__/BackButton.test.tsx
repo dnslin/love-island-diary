@@ -15,6 +15,11 @@ describe('BackButton', () => {
   beforeEach(() => {
     mockBack.mockClear();
     mockPush.mockClear();
+    Object.defineProperty(window, 'history', {
+      value: { length: 1 },
+      writable: true,
+      configurable: true,
+    });
   });
 
   test('calls router.back when history.length > 1', () => {
