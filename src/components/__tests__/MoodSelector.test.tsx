@@ -25,4 +25,22 @@ describe('MoodSelector', () => {
     expect(onChange).toHaveBeenCalledWith('happy');
     expect(screen.queryByText('想念')).not.toBeInTheDocument();
   });
+
+  test('点击外部关闭下拉面板', () => {
+    render(<MoodSelector value="sweet" onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(screen.getByText('开心')).toBeInTheDocument();
+
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByText('开心')).not.toBeInTheDocument();
+  });
+
+  test('按 Escape 关闭下拉面板', () => {
+    render(<MoodSelector value="sweet" onChange={jest.fn()} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(screen.getByText('开心')).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByText('开心')).not.toBeInTheDocument();
+  });
 });
