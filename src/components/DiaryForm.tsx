@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import { Input, Button } from 'animal-island-ui';
 import { createDiary } from '@/lib/actions';
 import { useDiaryDraft } from '@/hooks/useDiaryDraft';
 import { MoodSelector, type MoodValue } from './MoodSelector';
@@ -109,12 +110,10 @@ export function DiaryForm() {
         />
       </div>
 
-      <input
-        type="text"
+      <Input
         value={form.title}
         onChange={(e) => updateField('title', e.target.value)}
         placeholder="给今天起个名字（可选）"
-        className="w-full px-3 py-2 rounded-lg border border-border-soft bg-card text-sm text-text-main"
       />
 
       <div className="relative">
@@ -143,13 +142,16 @@ export function DiaryForm() {
         />
       </div>
 
-      <button
-        onClick={handleSubmit}
+      <Button
+        type="primary"
+        block
+        loading={saving}
         disabled={saving}
-        className="w-full py-3 rounded-lg bg-primary text-white font-medium disabled:opacity-50 mt-4"
+        htmlType="button"
+        onClick={handleSubmit}
       >
-        {saving ? '保存中...' : '保存'}
-      </button>
+        保存
+      </Button>
     </div>
   );
 }

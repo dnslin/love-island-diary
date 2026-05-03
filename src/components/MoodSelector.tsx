@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const MOODS = [
   { value: 'sweet', label: '甜甜的', color: '#F7C8D0' },
@@ -50,39 +51,50 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
         aria-expanded={open}
         aria-haspopup="listbox"
       >
-        <span
+        <motion.span
           className="w-3 h-3 rounded-full"
           style={{ backgroundColor: selected.color }}
+          animate={{ scale: [1, 1.3, 1] }}
+          transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+          key={selected.value}
         />
         <span className="text-sm text-text-main">{selected.label}</span>
       </button>
 
-      {open && (
-        <div
-          className="absolute z-10 mt-1 w-full min-w-[120px] rounded-lg border border-border-soft bg-card shadow-lg overflow-hidden"
-          role="listbox"
-        >
-          {MOODS.map((mood) => (
-            <button
-              key={mood.value}
-              type="button"
-              role="option"
-              aria-selected={mood.value === value}
-              onClick={() => {
-                onChange(mood.value);
-                setOpen(false);
-              }}
-              className="flex items-center gap-2 w-full px-3 py-2 hover:bg-cream text-left"
-            >
-              <span
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: mood.color }}
-              />
-              <span className="text-sm text-text-main">{mood.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="absolute z-10 mt-1 w-full min-w-[120px] rounded-lg border border-border-soft bg-card shadow-lg overflow-hidden"
+            role="listbox"
+            initial={{ opacity: 0, y: -4, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          >
+            {MOODS.map((mood) => (
+              <button
+                key={mood.value}
+                type="button"
+                role="option"
+                aria-selected={mood.value === value}
+                onClick={() => {
+                  onChange(mood.value);
+                  setOpen(false);
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 hover:bg-cream text-left"
+              >
+                <motion.span
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: mood.color }}
+                  whileTap={{ scale: 0.8 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                />
+                <span className="text-sm text-text-main">{mood.label}</span>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

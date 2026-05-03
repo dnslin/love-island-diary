@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function useDiaryDraft<T>(key: string, defaultValue: T) {
   const [draft, setDraft] = useState<T>(() => {
@@ -16,6 +16,12 @@ export function useDiaryDraft<T>(key: string, defaultValue: T) {
     return defaultValue;
   });
 
+  const defaultValueRef = useRef(defaultValue);
+
+  useEffect(() => {
+    defaultValueRef.current = defaultValue;
+  }, [defaultValue]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const timer = setTimeout(() => {
@@ -27,7 +33,7 @@ export function useDiaryDraft<T>(key: string, defaultValue: T) {
   const clearDraft = () => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(key);
-    setDraft(defaultValue);
+    setDraft(defaultValueRef.current);
   };
 
   return [draft, setDraft, clearDraft] as const;
