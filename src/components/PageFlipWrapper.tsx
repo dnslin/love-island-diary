@@ -40,55 +40,59 @@ export function PageFlipWrapper({
   currentId,
 }: PageFlipWrapperProps) {
   const router = useRouter();
-  const [direction, setDirection] = useState<Direction | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const [direction, setDirection] = useState<Direction | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('pageFlipDirection');
+      if (saved) {
+        sessionStorage.removeItem('pageFlipDirection');
+        return saved as Direction;
+      }
+    }
+    return null;
+  });
   const touchStartX = useRef<number | null>(null);
 
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const navigateTo = useCallback(
-    (targetId: string, dir: Direction) => {
+  const handleExitComplete = useCallback(() => {
+    if (!direction) return;
+    const targetId = direction === 'right' ? nextId : prevId;
+    if (targetId) {
       if (prefersReducedMotion) {
         router.push(`/diary/${targetId}`);
-        return;
+      } else {
+        sessionStorage.setItem('pageFlipDirection', direction);
+        router.push(`/diary/${targetId}`);
       }
-      setDirection(dir);
-      setIsAnimating(true);
-    },
-    [prefersReducedMotion, router]
-  );
+    }
+  }, [direction, prevId, nextId, router, prefersReducedMotion]);
 
   const goToPrev = useCallback(() => {
-    if (isAnimating || prevId === null) return;
-    navigateTo(prevId, 'left');
-  }, [isAnimating, prevId, navigateTo]);
+    if (isExiting || prevId === null) return;
+    setDirection('left');
+    setIsExiting(true);
+  }, [isExiting, prevId]);
 
   const goToNext = useCallback(() => {
-    if (isAnimating || nextId === null) return;
-    navigateTo(nextId, 'right');
-  }, [isAnimating, nextId, navigateTo]);
-
-  const handleAnimationComplete = useCallback(() => {
-    if (direction === 'left' && prevId !== null) {
-      router.push(`/diary/${prevId}`);
-    } else if (direction === 'right' && nextId !== null) {
-      router.push(`/diary/${nextId}`);
-    }
-  }, [direction, prevId, nextId, router]);
+    if (isExiting || nextId === null) return;
+    setDirection('right');
+    setIsExiting(true);
+  }, [isExiting, nextId]);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (isAnimating) return;
+      if (isExiting) return;
       touchStartX.current = e.touches[0].clientX;
     },
-    [isAnimating]
+    [isExiting]
   );
 
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent) => {
-      if (isAnimating || touchStartX.current === null) return;
+      if (isExiting || touchStartX.current === null) return;
       const diff = e.changedTouches[0].clientX - touchStartX.current;
       if (diff > 80) {
         goToPrev();
@@ -97,7 +101,7 @@ export function PageFlipWrapper({
       }
       touchStartX.current = null;
     },
-    [isAnimating, goToPrev, goToNext]
+    [isExiting, goToPrev, goToNext]
   );
 
   return (
@@ -134,7 +138,7 @@ export function PageFlipWrapper({
               <button
                 type="button"
                 aria-label="上一篇"
-                disabled={isAnimating}
+                disabled={isExiting}
                 onClick={goToPrev}
                 className="text-text-sub hover:text-text-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -157,7 +161,7 @@ export function PageFlipWrapper({
               <button
                 type="button"
                 aria-label="下一篇"
-                disabled={isAnimating}
+                disabled={isExiting}
                 onClick={goToNext}
                 className="text-text-sub hover:text-text-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -184,25 +188,26 @@ export function PageFlipWrapper({
           className="mb-6"
           style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
         >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={currentId}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-              onAnimationComplete={handleAnimationComplete}
-              style={{
-                transformStyle: 'preserve-3d',
-                backfaceVisibility: 'hidden',
-              }}
-            >
-              <div className="bg-card rounded-2xl p-4 shadow-sm">
-                {children}
-              </div>
-            </motion.div>
+          <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
+            {!isExiting && (
+              <motion.div
+                key={currentId}
+                custom={direction}
+                variants={variants}
+                initial={direction ? 'enter' : false}
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                style={{
+                  transformStyle: 'preserve-3d',
+                  backfaceVisibility: 'hidden',
+                }}
+              >
+                <div className="bg-card rounded-2xl p-4 shadow-sm">
+                  {children}
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 

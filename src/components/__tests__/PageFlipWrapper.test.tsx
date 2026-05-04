@@ -21,20 +21,45 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+const mockSessionStorage = (() => {
+  const store: Record<string, string> = {};
+  return {
+    getItem: jest.fn((key: string) => store[key] || null),
+    setItem: jest.fn((key: string, value: string) => {
+      store[key] = value;
+    }),
+    removeItem: jest.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: jest.fn(() => {
+      Object.keys(store).forEach((k) => delete store[k]);
+    }),
+  };
+})();
+
+Object.defineProperty(window, 'sessionStorage', {
+  writable: true,
+  value: mockSessionStorage,
+});
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, onAnimationComplete, ...props }: any) => {
-      if (onAnimationComplete) onAnimationComplete();
-      return <div {...props}>{children}</div>;
-    },
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children, onExitComplete }: any) => {
+    // 当 children 被移除时（exit），立即触发 onExitComplete 模拟动画完成
+    if (!children && onExitComplete) {
+      onExitComplete();
+    }
+    return <>{children}</>;
+  },
 }));
 
 describe('PageFlipWrapper', () => {
   beforeEach(() => {
     mockPush.mockClear();
+    mockSessionStorage.clear();
   });
 
   it('渲染 children 内容', () => {
@@ -59,6 +84,7 @@ describe('PageFlipWrapper', () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/diary/prev1');
     });
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith('pageFlipDirection', 'left');
   });
 
   it('点击下一篇按钮后调用 router.push', async () => {
@@ -73,6 +99,7 @@ describe('PageFlipWrapper', () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/diary/next1');
     });
+    expect(mockSessionStorage.setItem).toHaveBeenCalledWith('pageFlipDirection', 'right');
   });
 
   it('prevId 为 null 时隐藏上一篇按钮', () => {
@@ -106,5 +133,20 @@ describe('PageFlipWrapper', () => {
 
     expect(screen.queryByLabelText('上一篇')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('下一篇')).not.toBeInTheDocument();
+  });
+
+  it('点击按钮后禁用导航按钮（动画锁）', () => {
+    render(
+      <PageFlipWrapper prevId="prev1" nextId="next1" currentId="id1">
+        <div>内容</div>
+      </PageFlipWrapper>
+    );
+
+    const prevBtn = screen.getByLabelText('上一篇');
+    fireEvent.click(prevBtn);
+
+    // 按钮被 disabled
+    expect(prevBtn).toBeDisabled();
+    expect(screen.getByLabelText('下一篇')).toBeDisabled();
   });
 });
