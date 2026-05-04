@@ -72,6 +72,21 @@ describe('Diary Actions', () => {
     expect(list[2].title).toBe('A');
   });
 
+  test('getDiaryList sorts same-day entries by createdAt desc', async () => {
+    const sameDate = new Date('2025-01-15');
+    const first = await createDiary({ date: sameDate, title: 'First', content: 'a' });
+    const second = await createDiary({ date: sameDate, title: 'Second', content: 'b' });
+    const third = await createDiary({ date: sameDate, title: 'Third', content: 'c' });
+
+    const base = dayjs('2025-01-15T10:00:00.000Z');
+    await prisma.diaryEntry.update({ where: { id: first.id }, data: { createdAt: base.toDate() } });
+    await prisma.diaryEntry.update({ where: { id: second.id }, data: { createdAt: base.add(1, 'hour').toDate() } });
+    await prisma.diaryEntry.update({ where: { id: third.id }, data: { createdAt: base.add(2, 'hour').toDate() } });
+
+    const list = await getDiaryList();
+    expect(list.map((d) => d.title)).toEqual(['Third', 'Second', 'First']);
+  });
+
   test('updateDiary updates fields and images', async () => {
     const created = await createDiary({
       date: new Date('2025-01-15'),
