@@ -21,6 +21,7 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onAnimationComplete, ...props }: any) => {
