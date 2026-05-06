@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,43 +41,50 @@ export function PageFlipWrapper({
 }: PageFlipWrapperProps) {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
-  const [direction, setDirection] = useState<Direction | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('pageFlipDirection');
-      if (saved) {
-        sessionStorage.removeItem('pageFlipDirection');
-        return saved as Direction;
-      }
-    }
-    return null;
-  });
+  const [direction, setDirection] = useState<Direction | null>(null);
+  const directionRef = useRef<Direction | null>(null);
   const touchStartX = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    const saved = sessionStorage.getItem('pageFlipDirection');
+    if (saved) {
+      sessionStorage.removeItem('pageFlipDirection');
+      const dir = saved as Direction;
+      directionRef.current = dir;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDirection(dir);
+    }
+  }, []);
 
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const handleExitComplete = useCallback(() => {
-    if (!direction) return;
-    const targetId = direction === 'right' ? nextId : prevId;
+    const dir = directionRef.current;
+    if (!dir) return;
+    const targetId = dir === 'right' ? nextId : prevId;
     if (targetId) {
       if (prefersReducedMotion) {
         router.push(`/diary/${targetId}`);
       } else {
-        sessionStorage.setItem('pageFlipDirection', direction);
+        sessionStorage.setItem('pageFlipDirection', dir);
         router.push(`/diary/${targetId}`);
       }
     }
-  }, [direction, prevId, nextId, router, prefersReducedMotion]);
+    directionRef.current = null;
+  }, [prevId, nextId, router, prefersReducedMotion]);
 
   const goToPrev = useCallback(() => {
     if (isExiting || prevId === null) return;
+    directionRef.current = 'left';
     setDirection('left');
     setIsExiting(true);
   }, [isExiting, prevId]);
 
   const goToNext = useCallback(() => {
     if (isExiting || nextId === null) return;
+    directionRef.current = 'right';
     setDirection('right');
     setIsExiting(true);
   }, [isExiting, nextId]);
