@@ -13,7 +13,13 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import dayjs from 'dayjs';
+import { timingSafeEqual } from 'crypto';
 import { signAuthToken, requireAdmin } from './auth';
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 export async function createDiary(data: CreateDiaryInput) {
   const authError = await requireAdmin();
@@ -246,7 +252,7 @@ export async function saveCoupleProfileAction(
 export async function verifyViewPassword(
   password: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  if (password === process.env.VIEW_PASSWORD) {
+  if (safeCompare(password, process.env.VIEW_PASSWORD ?? '')) {
     await signAuthToken('viewer');
     return { ok: true };
   }
@@ -256,7 +262,7 @@ export async function verifyViewPassword(
 export async function verifyAdminPassword(
   password: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  if (password === process.env.ADMIN_PASSWORD) {
+  if (safeCompare(password, process.env.ADMIN_PASSWORD ?? '')) {
     await signAuthToken('admin');
     return { ok: true };
   }

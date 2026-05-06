@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-function getSecret(): Uint8Array {
+const SECRET = (() => {
   const secret = process.env.AUTH_SECRET;
   if (!secret) {
     throw new Error('AUTH_SECRET environment variable is required');
   }
   return new TextEncoder().encode(secret);
-}
+})();
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -28,8 +28,7 @@ export async function proxy(request: NextRequest) {
 
   if (token) {
     try {
-      const secret = getSecret();
-      const { payload } = await jwtVerify(token, secret, { clockTolerance: 60 });
+      const { payload } = await jwtVerify(token, SECRET, { clockTolerance: 60 });
       if (payload.role === 'viewer' || payload.role === 'admin') {
         role = payload.role as 'viewer' | 'admin';
       }
@@ -55,9 +54,11 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/settings/') ||
     pathname.endsWith('/edit');
 
-  // /settings 在首次引导时允许访问（CoupleProfile 不存在的情况由页面内逻辑处理）
-  // 这里仅当已认证但不是 admin 时拦截；未认证用户访问 /settings 由页面内逻辑判断是否需要 redirect
-  if (isAdminPath && role !== 'admin' && pathname !== '/settings') {
+  if (isAdminPath && role !== 'admin') {
+    // /settings 允许未认证用户访问（首次设置引导）
+    if (pathname === '/settings' && !role) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL('/', request.url));
   }
 

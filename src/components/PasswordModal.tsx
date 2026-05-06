@@ -79,7 +79,6 @@ export default function PasswordModal({
             placeholder='请输入密码'
             disabled={isLoading}
             className='w-full px-4 py-3 rounded-xl border border-border-soft bg-cream text-text-main text-base placeholder:text-text-sub focus:outline-none focus:border-[#ffcc00] transition-colors disabled:opacity-50'
-            autoFocus
           />
 
           {error && (

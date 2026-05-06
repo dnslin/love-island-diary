@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import AdminPasswordModal from './AdminPasswordModal';
 
 interface AdminAuthTriggerProps {
@@ -10,6 +10,21 @@ interface AdminAuthTriggerProps {
 export default function AdminAuthTrigger({ children }: AdminAuthTriggerProps) {
   const [showModal, setShowModal] = useState(false);
   const touchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (touchTimerRef.current) {
+        clearTimeout(touchTimerRef.current);
+      }
+    };
+  }, []);
+
+  const clearTouchTimer = () => {
+    if (touchTimerRef.current) {
+      clearTimeout(touchTimerRef.current);
+      touchTimerRef.current = null;
+    }
+  };
 
   const handleDoubleClick = () => {
     setShowModal(true);
@@ -22,10 +37,7 @@ export default function AdminAuthTrigger({ children }: AdminAuthTriggerProps) {
   };
 
   const handleTouchEnd = () => {
-    if (touchTimerRef.current) {
-      clearTimeout(touchTimerRef.current);
-      touchTimerRef.current = null;
-    }
+    clearTouchTimer();
   };
 
   return (
@@ -34,6 +46,7 @@ export default function AdminAuthTrigger({ children }: AdminAuthTriggerProps) {
         onDoubleClick={handleDoubleClick}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchMove={clearTouchTimer}
         className='cursor-default select-none'
       >
         {children}
