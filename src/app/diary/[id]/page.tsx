@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getDiaryById, getDiaryNeighbors, getDiaryList } from '@/lib/actions';
+import { getAuthRole } from '@/lib/auth';
 import { PageFlipWrapper } from '@/components/PageFlipWrapper';
 import { DiaryDetail } from '@/components/DiaryDetail';
 
@@ -17,10 +18,11 @@ export async function generateMetadata({ params }: DiaryDetailPageProps): Promis
 
 export default async function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   const { id } = await params;
-  const [entry, { prev, next }, allEntries] = await Promise.all([
+  const [entry, { prev, next }, allEntries, role] = await Promise.all([
     getDiaryById(id),
     getDiaryNeighbors(id),
     getDiaryList(),
+    getAuthRole(),
   ]);
 
   if (!entry) {
@@ -35,26 +37,28 @@ export default async function DiaryDetailPage({ params }: DiaryDetailPageProps) 
       nextId={next}
       currentId={id}
       actions={
-        <Link
-          href={`/diary/${id}/edit`}
-          aria-label="编辑"
-          className="text-text-sub hover:text-text-main transition-colors inline-flex items-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        role === 'admin' ? (
+          <Link
+            href={`/diary/${id}/edit`}
+            aria-label="编辑"
+            className="text-text-sub hover:text-text-main transition-colors inline-flex items-center"
           >
-            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-            <path d="m15 5 4 4" />
-          </svg>
-        </Link>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+              <path d="m15 5 4 4" />
+            </svg>
+          </Link>
+        ) : null
       }
     >
       <DiaryDetail entry={entry} entryNumber={entryNumber} />

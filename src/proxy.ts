@@ -56,8 +56,8 @@ export async function proxy(request: NextRequest) {
     pathname.endsWith('/edit');
 
   // /settings 在首次引导时允许访问（CoupleProfile 不存在的情况由页面内逻辑处理）
-  // 这里仅当已认证但不是 admin 时拦截
-  if (isAdminPath && role !== 'admin') {
+  // 这里仅当已认证但不是 admin 时拦截；未认证用户访问 /settings 由页面内逻辑判断是否需要 redirect
+  if (isAdminPath && role !== 'admin' && pathname !== '/settings') {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

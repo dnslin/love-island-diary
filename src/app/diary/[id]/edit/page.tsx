@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { DiaryForm } from '@/components/DiaryForm';
 import { DeleteDiarySection } from '@/components/DeleteDiarySection';
 import { getDiaryById } from '@/lib/actions';
+import { getAuthRole } from '@/lib/auth';
 
 export async function generateMetadata({
   params,
@@ -24,10 +25,17 @@ export default async function EditDiaryPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const entry = await getDiaryById(id);
+  const [entry, role] = await Promise.all([
+    getDiaryById(id),
+    getAuthRole(),
+  ]);
 
   if (!entry) {
     notFound();
+  }
+
+  if (role !== 'admin') {
+    redirect(`/diary/${id}`);
   }
 
   return (

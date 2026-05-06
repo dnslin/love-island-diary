@@ -30,7 +30,12 @@ export function DeleteDiarySection({ entryId }: DeleteDiarySectionProps) {
     setDeleting(true);
     setDeleteError('');
     try {
-      await deleteDiary(entryId);
+      const result = await deleteDiary(entryId);
+      if (result && 'ok' in result && !result.ok) {
+        setDeleteError(result.error);
+        setDeleting(false);
+        return;
+      }
       setShowModal(false);
       router.push('/diary');
     } catch {

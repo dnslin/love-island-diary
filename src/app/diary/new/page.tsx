@@ -1,12 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { DiaryForm } from '@/components/DiaryForm';
+import { getAuthRole } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: '写下今天',
 };
 
-export default function NewDiaryPage() {
+export default async function NewDiaryPage() {
+  const role = await getAuthRole();
+
+  if (role !== 'admin') {
+    redirect('/');
+  }
+
   return (
     <main className="min-h-screen bg-cream">
       <div className="max-w-[480px] mx-auto px-4 py-6">
