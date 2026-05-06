@@ -103,18 +103,26 @@ export function DiaryForm({
       };
 
       if (mode === 'edit' && entryId) {
-        await updateDiary(entryId, payload);
+        const result = await updateDiary(entryId, payload);
+        if (result && 'ok' in result && !result.ok) {
+          setError(result.error);
+          return;
+        }
         clearDraft();
         setSuccess(true);
         timerRef.current = setTimeout(() => {
           router.push(`/diary/${entryId}`);
         }, 1500);
       } else {
-        const entry = await createDiary(payload);
+        const result = await createDiary(payload);
+        if (result && 'ok' in result && !result.ok) {
+          setError(result.error);
+          return;
+        }
         clearDraft();
         setSuccess(true);
         timerRef.current = setTimeout(() => {
-          router.push(`/diary/${entry.id}`);
+          router.push(`/diary/${(result as { id: string }).id}`);
         }, 1500);
       }
     } catch (err) {

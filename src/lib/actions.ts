@@ -13,8 +13,18 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import dayjs from 'dayjs';
+import { timingSafeEqual } from 'crypto';
+import { signAuthToken, requireAdmin } from './auth';
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 export async function createDiary(data: CreateDiaryInput) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const parsed = CreateDiarySchema.parse(data);
   const { images, ...entryData } = parsed;
 
@@ -46,6 +56,9 @@ export async function getDiaryList() {
 }
 
 export async function updateDiary(id: string, data: UpdateDiaryInput) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const parsed = UpdateDiarySchema.parse(data);
   const { images, ...entryData } = parsed;
 
@@ -73,6 +86,9 @@ export async function updateDiary(id: string, data: UpdateDiaryInput) {
 }
 
 export async function deleteDiary(id: string) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   await prisma.diaryEntry.delete({
     where: { id },
   });
@@ -204,6 +220,14 @@ export async function saveCoupleProfileAction(
   _prev: SettingsFormState,
   formData: FormData,
 ): Promise<SettingsFormState> {
+  const profile = await getCoupleProfile();
+  if (profile) {
+    const authError = await requireAdmin();
+    if (authError) {
+      return { ok: false, formError: authError.error };
+    }
+  }
+
   const parsed = SettingsActionSchema.safeParse({
     personAName: formData.get('personAName'),
     personBName: formData.get('personBName'),
@@ -223,4 +247,24 @@ export async function saveCoupleProfileAction(
 
   revalidatePath('/');
   redirect('/');
+}
+
+export async function verifyViewPassword(
+  password: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (safeCompare(password, process.env.VIEW_PASSWORD ?? '')) {
+    await signAuthToken('viewer');
+    return { ok: true };
+  }
+  return { ok: false, error: '密码错误，请重试' };
+}
+
+export async function verifyAdminPassword(
+  password: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (safeCompare(password, process.env.ADMIN_PASSWORD ?? '')) {
+    await signAuthToken('admin');
+    return { ok: true };
+  }
+  return { ok: false, error: '密码错误，请重试' };
 }

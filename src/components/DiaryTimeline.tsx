@@ -5,13 +5,14 @@ import type { DiaryEntry, DiaryImage } from '@prisma/client';
 
 interface DiaryTimelineProps {
   groups: Map<string, Array<DiaryEntry & { images: DiaryImage[] }>>;
+  showWriteButton?: boolean;
 }
 
 function defaultTitle(date: Date): string {
   return `${dayjs(date).format('YYYY年M月D日')} 的心情`;
 }
 
-export function DiaryTimeline({ groups }: DiaryTimelineProps) {
+export function DiaryTimeline({ groups, showWriteButton = false }: DiaryTimelineProps) {
   if (groups.size === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -31,11 +32,13 @@ export function DiaryTimeline({ groups }: DiaryTimelineProps) {
         <p className="mt-3 text-sm text-text-sub">
           还没有日记呢，翻开第一页吧
         </p>
-        <div className="mt-4">
-          <Link href="/diary/new">
-            <Button type="primary">写下第一篇</Button>
-          </Link>
-        </div>
+        {showWriteButton && (
+          <div className="mt-4">
+            <Link href="/diary/new">
+              <Button type="primary">写下第一篇</Button>
+            </Link>
+          </div>
+        )}
       </div>
     );
   }

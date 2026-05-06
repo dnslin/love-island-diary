@@ -31,8 +31,19 @@ jest.mock('next/link', () => {
 });
 
 describe('DiaryTimeline', () => {
-  test('renders empty state', () => {
+  test('renders empty state without write button by default', () => {
     render(<DiaryTimeline groups={new Map()} />);
+
+    expect(
+      screen.getByText('还没有日记呢，翻开第一页吧')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: '写下第一篇' })
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders empty state with write button when showWriteButton is true', () => {
+    render(<DiaryTimeline groups={new Map()} showWriteButton={true} />);
 
     expect(
       screen.getByText('还没有日记呢，翻开第一页吧')

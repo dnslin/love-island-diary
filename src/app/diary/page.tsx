@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getDiaryList } from '@/lib/actions';
+import { getAuthRole } from '@/lib/auth';
 import { DiaryTimeline } from '@/components/DiaryTimeline';
 import { BackButton } from '@/components/BackButton';
 import dayjs from '@/lib/dayjs';
@@ -26,7 +27,10 @@ function groupByMonth(entries: Entry[]) {
 }
 
 export default async function DiaryPage() {
-  const entries = await getDiaryList();
+  const [entries, role] = await Promise.all([
+    getDiaryList(),
+    getAuthRole(),
+  ]);
   const groups = groupByMonth(entries);
 
   return (
@@ -36,7 +40,7 @@ export default async function DiaryPage() {
           <BackButton />
           <h1 className="text-lg font-bold text-text-main">目录</h1>
         </div>
-        <DiaryTimeline groups={groups} />
+        <DiaryTimeline groups={groups} showWriteButton={role === 'admin'} />
       </div>
     </main>
   );

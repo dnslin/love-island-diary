@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import dayjs from 'dayjs';
+import { getAuthRole } from '@/lib/auth';
 import { getCoupleProfile, getCoverStats, getDiaryList } from '@/lib/actions';
 import CoverLogo from '@/components/CoverLogo';
 import AnimatedDays from '@/components/AnimatedDays';
-import FloatingButton from '@/components/FloatingButton';
-import SecretWriteEntry from '@/components/SecretWriteEntry';
+import CoverActions from '@/components/CoverActions';
+import AdminAuthTrigger from '@/components/AdminAuthTrigger';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,10 +18,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [profile, stats, diaries] = await Promise.all([
+  const [profile, stats, diaries, role] = await Promise.all([
     getCoupleProfile(),
     getCoverStats(),
     getDiaryList(),
+    getAuthRole(),
   ]);
 
   const latestDiary = diaries[0] ?? null;
@@ -36,26 +38,28 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-cream px-4 relative">
       <div className="mx-auto max-w-[480px] min-h-screen relative">
-        {/* 设置按钮 */}
-        <Link
-          href="/settings"
-          className="absolute top-4 right-0 p-2 text-text-sub hover:text-text-main transition-colors"
-          aria-label="设置"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {/* 设置按钮 — 仅 admin 可见 */}
+        {role === 'admin' && (
+          <Link
+            href="/settings"
+            className="absolute top-4 right-0 p-2 text-text-sub hover:text-text-main transition-colors"
+            aria-label="设置"
           >
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </Link>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </Link>
+        )}
 
         {/* Logo */}
         <div className="absolute top-14 left-2">
@@ -81,11 +85,13 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* 天数 */}
-        <div className="absolute top-50 right-6 text-right">
-          <AnimatedDays days={days} />
-          <div className="text-[11px] text-text-sub mt-1">天</div>
-        </div>
+        {/* 天数 — 包裹在 AdminAuthTrigger 中 */}
+        <AdminAuthTrigger>
+          <div className="absolute top-50 right-6 text-right">
+            <AnimatedDays days={days} />
+            <div className="text-[11px] text-text-sub mt-1">天</div>
+          </div>
+        </AdminAuthTrigger>
 
         {/* 装饰元素：岛屿线稿 + 手账贴纸 */}
         {/* 岛屿线稿 */}
@@ -181,19 +187,19 @@ export default async function Home() {
           <path d="M12 4 Q12 0 9 3 Q5 0 7 4 Q1 4 5 8 Q0 11 5 11 Q0 15 7 15 Q5 20 9 16 Q12 20 12 15 Q15 20 17 16 Q19 20 17 15 Q23 15 19 11 Q24 8 17 8 Q21 4 15 4 Q12 0 12 4Z" />
         </svg>
 
-        {/* 按钮 */}
-        <div className="absolute bottom-32 left-1/2 -translate-x-1/2">
-          <FloatingButton href={latestDiary ? `/diary/${latestDiary.id}` : '/diary/new'}>
-            {latestDiary ? '翻开日记' : '写下第一篇'}
-          </FloatingButton>
-        </div>
+        {/* 按钮区 */}
+        <CoverActions
+          isAuthenticated={!!role}
+          href={latestDiary ? `/diary/${latestDiary.id}` : '/diary/new'}
+          showWriteButton={role === 'admin'}
+        />
 
-        {/* 统计 — 连续点击3次进入写日记（隐蔽入口） */}
-        <SecretWriteEntry>
+        {/* 统计 — 包裹在 AdminAuthTrigger 中 */}
+        <AdminAuthTrigger>
           <div className="absolute bottom-6 right-6 text-[10px] text-text-sub">
             日记 {stats.diaryCount} · 回忆 {stats.memoryCount}
           </div>
-        </SecretWriteEntry>
+        </AdminAuthTrigger>
       </div>
     </div>
   );
