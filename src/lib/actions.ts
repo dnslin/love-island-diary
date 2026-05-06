@@ -13,9 +13,12 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import dayjs from 'dayjs';
-import { signAuthToken } from './auth';
+import { signAuthToken, requireAdmin } from './auth';
 
 export async function createDiary(data: CreateDiaryInput) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const parsed = CreateDiarySchema.parse(data);
   const { images, ...entryData } = parsed;
 
@@ -47,6 +50,9 @@ export async function getDiaryList() {
 }
 
 export async function updateDiary(id: string, data: UpdateDiaryInput) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const parsed = UpdateDiarySchema.parse(data);
   const { images, ...entryData } = parsed;
 
@@ -74,6 +80,9 @@ export async function updateDiary(id: string, data: UpdateDiaryInput) {
 }
 
 export async function deleteDiary(id: string) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   await prisma.diaryEntry.delete({
     where: { id },
   });
@@ -205,6 +214,14 @@ export async function saveCoupleProfileAction(
   _prev: SettingsFormState,
   formData: FormData,
 ): Promise<SettingsFormState> {
+  const profile = await getCoupleProfile();
+  if (profile) {
+    const authError = await requireAdmin();
+    if (authError) {
+      return { ok: false, formError: authError.error };
+    }
+  }
+
   const parsed = SettingsActionSchema.safeParse({
     personAName: formData.get('personAName'),
     personBName: formData.get('personBName'),

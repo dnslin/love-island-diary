@@ -13,6 +13,12 @@ import {
 } from '../actions';
 import dayjs from 'dayjs';
 
+jest.mock('../auth', () => ({
+  requireAdmin: jest.fn(() => Promise.resolve(null)),
+}));
+
+const { requireAdmin } = jest.requireMock('../auth');
+
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('next/navigation', () => ({
   redirect: (url: string) => {
@@ -260,6 +266,40 @@ describe('Cover Stats', () => {
     const stats = await getCoverStats();
     expect(stats.diaryCount).toBe(2);
     expect(stats.memoryCount).toBe(2);
+  });
+});
+
+describe('权限保护', () => {
+  test('createDiary 未认证时返回权限错误', async () => {
+    requireAdmin.mockResolvedValueOnce({ ok: false, error: '权限不足' });
+
+    const result = await createDiary({
+      date: new Date(),
+      title: '测试',
+      content: '内容',
+    });
+
+    expect(result).toEqual({ ok: false, error: '权限不足' });
+  });
+
+  test('updateDiary 未认证时返回权限错误', async () => {
+    requireAdmin.mockResolvedValueOnce({ ok: false, error: '权限不足' });
+
+    const result = await updateDiary('fake-id', {
+      date: new Date(),
+      title: '测试',
+      content: '内容',
+    });
+
+    expect(result).toEqual({ ok: false, error: '权限不足' });
+  });
+
+  test('deleteDiary 未认证时返回权限错误', async () => {
+    requireAdmin.mockResolvedValueOnce({ ok: false, error: '权限不足' });
+
+    const result = await deleteDiary('fake-id');
+
+    expect(result).toEqual({ ok: false, error: '权限不足' });
   });
 });
 

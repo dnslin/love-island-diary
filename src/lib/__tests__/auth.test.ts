@@ -40,14 +40,14 @@ describe('signAuthToken', () => {
 
   test('sets secure flag in production', async () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    (process.env as { NODE_ENV: string }).NODE_ENV = 'production';
 
     await signAuthToken('admin');
 
     const [, , options] = mockSet.mock.calls[0];
     expect(options.secure).toBe(true);
 
-    process.env.NODE_ENV = originalEnv;
+    (process.env as { NODE_ENV: string }).NODE_ENV = originalEnv;
   });
 });
 
