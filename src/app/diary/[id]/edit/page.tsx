@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DiaryForm } from '@/components/DiaryForm';
+import { DeleteDiarySection } from '@/components/DeleteDiarySection';
 import { getDiaryById } from '@/lib/actions';
 
 export async function generateMetadata({
@@ -55,6 +56,7 @@ export default async function EditDiaryPage({
           <h1 className="text-lg font-bold text-text-main">编辑日记</h1>
         </div>
         <DiaryForm mode="edit" initialData={entry} entryId={id} />
+        <DeleteDiarySection entryId={id} />
       </div>
     </main>
   );
