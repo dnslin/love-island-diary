@@ -4,6 +4,7 @@ import type { DiaryEntry, DiaryImage } from '@prisma/client';
 
 interface DiaryDetailProps {
   entry: DiaryEntry & { images: DiaryImage[] };
+  entryNumber?: number;
 }
 
 const moodMap: Record<string, { label: string; color: string }> = {
@@ -14,7 +15,7 @@ const moodMap: Record<string, { label: string; color: string }> = {
   sad: { label: '小难过', color: '#E8C4A0' },
 };
 
-export function DiaryDetail({ entry }: DiaryDetailProps) {
+export function DiaryDetail({ entry, entryNumber }: DiaryDetailProps) {
   const displayTitle =
     entry.title || `${dayjs(entry.date).format('YYYY年M月D日')} 的心情`;
   const mood = moodMap[entry.mood] || moodMap.sweet;
@@ -23,18 +24,23 @@ export function DiaryDetail({ entry }: DiaryDetailProps) {
     <article className="space-y-4">
       <h1 className="text-xl font-bold text-text-main">{displayTitle}</h1>
 
-      <div className="flex items-center gap-2 text-sm text-text-sub">
-        <span>{dayjs(entry.date).format('YYYY年M月D日')}</span>
-        <span
-          className="flex items-center gap-1 px-2 py-0.5 rounded-full"
-          style={{ backgroundColor: mood.color + '33' }}
-        >
+      <div className="flex items-center justify-between text-sm text-text-sub">
+        <div className="flex items-center gap-2">
+          <span>{dayjs(entry.date).format('YYYY年M月D日')}</span>
           <span
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: mood.color }}
-          />
-          {mood.label}
-        </span>
+            className="flex items-center gap-1 px-2 py-0.5 rounded-full"
+            style={{ backgroundColor: mood.color + '33' }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: mood.color }}
+            />
+            {mood.label}
+          </span>
+        </div>
+        {entryNumber != null && (
+          <span>第 {entryNumber} 篇</span>
+        )}
       </div>
 
       <p className="text-base text-text-main whitespace-pre-wrap leading-relaxed">
