@@ -13,6 +13,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import dayjs from 'dayjs';
+import { signAuthToken } from './auth';
 
 export async function createDiary(data: CreateDiaryInput) {
   const parsed = CreateDiarySchema.parse(data);
@@ -223,4 +224,24 @@ export async function saveCoupleProfileAction(
 
   revalidatePath('/');
   redirect('/');
+}
+
+export async function verifyViewPassword(
+  password: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (password === process.env.VIEW_PASSWORD) {
+    await signAuthToken('viewer');
+    return { ok: true };
+  }
+  return { ok: false, error: '密码错误，请重试' };
+}
+
+export async function verifyAdminPassword(
+  password: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (password === process.env.ADMIN_PASSWORD) {
+    await signAuthToken('admin');
+    return { ok: true };
+  }
+  return { ok: false, error: '密码错误，请重试' };
 }
