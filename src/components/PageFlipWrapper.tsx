@@ -13,6 +13,7 @@ interface PageFlipWrapperProps {
   prevId: string | null;
   nextId: string | null;
   currentId: string;
+  actions?: React.ReactNode;
 }
 
 const variants = {
@@ -38,6 +39,7 @@ export function PageFlipWrapper({
   prevId,
   nextId,
   currentId,
+  actions,
 }: PageFlipWrapperProps) {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
@@ -141,6 +143,7 @@ export function PageFlipWrapper({
           </Link>
 
           <div className="flex gap-2">
+            {actions}
             {prevId !== null && (
               <button
                 type="button"

@@ -150,3 +150,28 @@ describe('PageFlipWrapper', () => {
     expect(screen.getByLabelText('下一篇')).toBeDisabled();
   });
 });
+
+describe('PageFlipWrapper actions slot', () => {
+  it('传入 actions 时渲染在顶部导航栏', () => {
+    render(
+      <PageFlipWrapper
+        prevId="prev-1"
+        nextId="next-1"
+        currentId="curr-1"
+        actions={<button data-testid="edit-btn">编辑</button>}
+      >
+        <div>内容</div>
+      </PageFlipWrapper>,
+    );
+    expect(screen.getByTestId('edit-btn')).toBeInTheDocument();
+  });
+
+  it('不传 actions 时不渲染插槽', () => {
+    render(
+      <PageFlipWrapper prevId="prev-1" nextId="next-1" currentId="curr-1">
+        <div>内容</div>
+      </PageFlipWrapper>,
+    );
+    expect(screen.queryByTestId('edit-btn')).not.toBeInTheDocument();
+  });
+});

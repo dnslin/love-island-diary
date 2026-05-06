@@ -4,11 +4,12 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Input, Button } from 'animal-island-ui';
-import { createDiary } from '@/lib/actions';
+import { createDiary, updateDiary } from '@/lib/actions';
 import { useDiaryDraft } from '@/hooks/useDiaryDraft';
 import { MoodSelector, type MoodValue } from './MoodSelector';
 import { ImageUrlInput } from './ImageUrlInput';
 import { validateDiaryForm } from './DiaryForm.validation';
+import type { DiaryEntry, DiaryImage } from '@prisma/client';
 
 export interface DiaryFormData {
   date: string;
@@ -26,11 +27,40 @@ const defaultForm: DiaryFormData = {
   images: [],
 };
 
-export function DiaryForm() {
+export interface DiaryFormProps {
+  mode?: 'create' | 'edit';
+  initialData?: DiaryEntry & { images: DiaryImage[] };
+  entryId?: string;
+}
+
+function entryToFormData(
+  entry: DiaryEntry & { images: DiaryImage[] },
+): DiaryFormData {
+  return {
+    date: dayjs(entry.date).format('YYYY-MM-DD'),
+    title: entry.title ?? '',
+    content: entry.content,
+    mood: entry.mood as MoodValue,
+    images: entry.images.map((img) => img.url),
+  };
+}
+
+export function DiaryForm({
+  mode = 'create',
+  initialData,
+  entryId,
+}: DiaryFormProps) {
   const router = useRouter();
+  const draftKey =
+    mode === 'edit' && entryId
+      ? `diary-draft-edit-${entryId}`
+      : 'diary-draft';
+  const initialForm =
+    mode === 'edit' && initialData ? entryToFormData(initialData) : defaultForm;
+
   const [form, setForm, clearDraft] = useDiaryDraft<DiaryFormData>(
-    'diary-draft',
-    defaultForm,
+    draftKey,
+    initialForm,
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -64,31 +94,42 @@ export function DiaryForm() {
 
     setSaving(true);
     try {
-      const entry = await createDiary({
+      const payload = {
         date: new Date(form.date),
         title: form.title || undefined,
         content: form.content,
         mood: form.mood,
         images: form.images.length > 0 ? form.images : undefined,
-      });
-      clearDraft();
-      setSuccess(true);
-      timerRef.current = setTimeout(() => {
-        router.push(`/diary/${entry.id}`);
-      }, 1500);
+      };
+
+      if (mode === 'edit' && entryId) {
+        await updateDiary(entryId, payload);
+        clearDraft();
+        setSuccess(true);
+        timerRef.current = setTimeout(() => {
+          router.push(`/diary/${entryId}`);
+        }, 1500);
+      } else {
+        const entry = await createDiary(payload);
+        clearDraft();
+        setSuccess(true);
+        timerRef.current = setTimeout(() => {
+          router.push(`/diary/${entry.id}`);
+        }, 1500);
+      }
     } catch (err) {
       console.error('保存日记失败:', err);
       setError('保存失败，请稍后重试');
     } finally {
       setSaving(false);
     }
-  }, [form, router, clearDraft]);
+  }, [form, router, clearDraft, mode, entryId]);
 
   return (
     <div className="space-y-4">
       {success && (
         <div className="px-4 py-3 rounded-lg bg-primary/20 text-text-main text-sm text-center">
-          今天的心情已经收藏好了
+          {mode === 'edit' ? '修改已经收藏好了' : '今天的心情已经收藏好了'}
         </div>
       )}
       {error && (
