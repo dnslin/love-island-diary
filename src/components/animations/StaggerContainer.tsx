@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
 import { useReducedMotion } from './useReducedMotion'
+import { gentleEase } from './easing'
 
 interface StaggerContainerProps {
   children: ReactNode
@@ -23,7 +24,10 @@ export function StaggerContainer({
   const reducedMotion = useReducedMotion()
 
   const variants = reducedMotion
-    ? {}
+    ? {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1 },
+      }
     : {
         hidden: { opacity: 0 },
         visible: {
@@ -48,13 +52,16 @@ export function StaggerItem({ children, className }: StaggerItemProps) {
   const reducedMotion = useReducedMotion()
 
   const variants = reducedMotion
-    ? {}
+    ? {
+        hidden: { opacity: 1, y: 0 },
+        visible: { opacity: 1, y: 0 },
+      }
     : {
         hidden: { opacity: 0, y: 8 },
         visible: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
+          transition: { duration: 0.25, ease: gentleEase },
         },
       }
 

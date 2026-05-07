@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
 import { useReducedMotion } from './useReducedMotion'
+import { gentleEase } from './easing'
 
 interface FadeInProps {
   children: ReactNode
@@ -26,7 +27,7 @@ export function FadeIn({
       transition={
         reducedMotion
           ? { duration: 0 }
-          : { duration, delay, ease: [0.4, 0, 0.2, 1] }
+          : { duration, delay, ease: gentleEase }
       }
       className={className}
     >

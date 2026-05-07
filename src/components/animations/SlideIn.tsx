@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
 import { useReducedMotion } from './useReducedMotion'
+import { gentleEase } from './easing'
 
 type Direction = 'top' | 'bottom' | 'left' | 'right'
 
@@ -37,7 +38,7 @@ export function SlideIn({
       transition={
         reducedMotion
           ? { duration: 0 }
-          : { duration, ease: [0.4, 0, 0.2, 1] }
+          : { duration, ease: gentleEase }
       }
       className={className}
     >
