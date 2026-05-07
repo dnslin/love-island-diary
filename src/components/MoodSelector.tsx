@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MoodIcon } from './illustrations';
 
 export const MOODS = [
   { value: 'sweet', label: '甜甜的', color: '#F7C8D0' },
@@ -44,16 +45,16 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
 
   return (
     <div className="relative" ref={ref}>
-      <button
+      <motion.button
         type="button"
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border-soft bg-card"
         aria-expanded={open}
         aria-haspopup="listbox"
+        whileTap={{ scale: 0.96 }}
+        transition={{ duration: 0.1 }}
       >
         <motion.span
-          className="w-3 h-3 rounded-full"
-          style={{ backgroundColor: selected.color }}
           animate={{ scale: 1.3 }}
           transition={{
             type: 'spring',
@@ -63,9 +64,11 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
             repeatType: 'reverse',
           }}
           key={selected.value}
-        />
+        >
+          <MoodIcon mood={selected.value} size={16} />
+        </motion.span>
         <span className="text-sm text-text-main">{selected.label}</span>
-      </button>
+      </motion.button>
 
       <AnimatePresence>
         {open && (
@@ -89,12 +92,9 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
                 }}
                 className="flex items-center gap-2 w-full px-3 py-2 hover:bg-cream text-left"
               >
-                <motion.span
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: mood.color }}
-                  whileTap={{ scale: 0.8 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                />
+                <motion.span whileTap={{ scale: 0.8 }} transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
+                  <MoodIcon mood={mood.value} size={16} />
+                </motion.span>
                 <span className="text-sm text-text-main">{mood.label}</span>
               </button>
             ))}
