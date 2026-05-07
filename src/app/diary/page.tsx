@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getDiaryList } from '@/lib/actions';
 import { getAuthRole } from '@/lib/auth';
 import { DiaryTimeline } from '@/components/DiaryTimeline';
@@ -36,9 +37,17 @@ export default async function DiaryPage() {
   return (
     <main className="min-h-screen bg-cream">
       <div className="max-w-[480px] mx-auto px-4 py-6">
-        <div className="flex items-center gap-4 mb-6">
-          <BackButton />
-          <h1 className="text-lg font-bold text-text-main">目录</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <BackButton />
+            <h1 className="text-lg font-bold text-text-main">目录</h1>
+          </div>
+          <Link
+            href="/memories"
+            className="text-sm text-primary hover:text-accent transition-colors"
+          >
+            照片墙
+          </Link>
         </div>
         <DiaryTimeline groups={groups} showWriteButton={role === 'admin'} />
       </div>
