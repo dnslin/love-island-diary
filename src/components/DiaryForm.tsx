@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { Input, Button } from 'animal-island-ui';
 import { createDiary, updateDiary } from '@/lib/actions';
 import { useDiaryDraft } from '@/hooks/useDiaryDraft';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { MoodSelector, type MoodValue } from './MoodSelector';
 import { ImageUrlInput } from './ImageUrlInput';
 import { validateDiaryForm } from './DiaryForm.validation';
@@ -51,6 +52,7 @@ export function DiaryForm({
   entryId,
 }: DiaryFormProps) {
   const router = useRouter();
+  useKeyboardScroll();
   const draftKey =
     mode === 'edit' && entryId
       ? `diary-draft-edit-${entryId}`

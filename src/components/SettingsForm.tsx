@@ -8,6 +8,7 @@ import {
   saveCoupleProfileAction,
   type SettingsFormState,
 } from '@/lib/actions';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 type Props = {
   initial: {
@@ -25,6 +26,7 @@ export default function SettingsForm({ initial }: Props) {
     saveCoupleProfileAction,
     INITIAL_STATE,
   );
+  useKeyboardScroll();
 
   const isEdit = initial !== null;
   const today = dayjs().format('YYYY-MM-DD');
