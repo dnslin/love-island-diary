@@ -5,7 +5,7 @@ interface EmptyStateProps {
   children?: ReactNode
 }
 
-export default function EmptyState({
+export function EmptyState({
   message = '还没有日记呢，翻开第一页吧',
   children,
 }: EmptyStateProps) {
