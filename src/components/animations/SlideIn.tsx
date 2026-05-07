@@ -1,0 +1,47 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
+import { useReducedMotion } from './useReducedMotion'
+
+type Direction = 'top' | 'bottom' | 'left' | 'right'
+
+interface SlideInProps {
+  children: ReactNode
+  direction?: Direction
+  duration?: number
+  className?: string
+}
+
+const directionOffset: Record<Direction, { x?: number; y?: number }> = {
+  top: { y: -20 },
+  bottom: { y: 20 },
+  left: { x: -20 },
+  right: { x: 20 },
+}
+
+export function SlideIn({
+  children,
+  direction = 'top',
+  duration = 0.25,
+  className,
+}: SlideInProps) {
+  const reducedMotion = useReducedMotion()
+  const offset = directionOffset[direction]
+
+  return (
+    <motion.div
+      initial={offset}
+      animate={{ x: 0, y: 0 }}
+      exit={offset}
+      transition={
+        reducedMotion
+          ? { duration: 0 }
+          : { duration, ease: [0.4, 0, 0.2, 1] }
+      }
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
