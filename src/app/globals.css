@@ -34,11 +34,17 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 输入框字号覆盖：防止 iOS 自动放大 */
-input,
+/* 输入框字号覆盖：防止 iOS 自动放大（仅文本类输入） */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
 textarea,
 select {
-  font-size: 16px !important;
+  font-size: 16px;
 }
 
 /* 输入框聚焦边框统一为 animal-island-ui 焦点黄 */
@@ -60,7 +66,3 @@ textarea:focus {
   }
 }
 
-/* 封面页小屏高度适配 */
-@media (max-height: 700px) {
-  /* 预留微调空间，供 cover 页面覆盖使用 */
-}

@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className={`${hyTiaoTiao.variable} antialiased pb-[env(safe-area-inset-bottom)]`}>{children}</body>
+      <body className={`${hyTiaoTiao.variable} antialiased pb-safe`}>{children}</body>
     </html>
   );
 }

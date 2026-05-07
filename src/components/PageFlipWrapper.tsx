@@ -58,24 +58,16 @@ export function PageFlipWrapper({
     }
   }, []);
 
-  const prefersReducedMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   const handleExitComplete = useCallback(() => {
     const dir = directionRef.current;
     if (!dir) return;
     const targetId = dir === 'right' ? nextId : prevId;
     if (targetId) {
-      if (prefersReducedMotion) {
-        router.push(`/diary/${targetId}`);
-      } else {
-        sessionStorage.setItem('pageFlipDirection', dir);
-        router.push(`/diary/${targetId}`);
-      }
+      sessionStorage.setItem('pageFlipDirection', dir);
+      router.push(`/diary/${targetId}`);
     }
     directionRef.current = null;
-  }, [prevId, nextId, router, prefersReducedMotion]);
+  }, [prevId, nextId, router]);
 
   const goToPrev = useCallback(() => {
     if (isExiting || prevId === null) return;
