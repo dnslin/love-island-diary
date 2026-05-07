@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
 import { Input, Button } from 'animal-island-ui';
 import { createDiary, updateDiary } from '@/lib/actions';
 import { useDiaryDraft } from '@/hooks/useDiaryDraft';
@@ -10,6 +11,7 @@ import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import { MoodSelector, type MoodValue } from './MoodSelector';
 import { ImageUrlInput } from './ImageUrlInput';
 import { validateDiaryForm } from './DiaryForm.validation';
+import { Toast } from './animations';
 import type { DiaryEntry, DiaryImage } from '@prisma/client';
 
 export interface DiaryFormData {
@@ -137,11 +139,12 @@ export function DiaryForm({
 
   return (
     <div className="space-y-4">
-      {success && (
-        <div className="px-4 py-3 rounded-lg bg-primary/20 text-text-main text-sm text-center">
-          {mode === 'edit' ? '修改已经收藏好了' : '今天的心情已经收藏好了'}
-        </div>
-      )}
+      <Toast
+        message={mode === 'edit' ? '修改已经收藏好了' : '今天的心情已经收藏好了'}
+        visible={success}
+        onClose={() => setSuccess(false)}
+        autoClose={1500}
+      />
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-50 text-red-600 text-sm text-center">
           {error}
@@ -193,16 +196,18 @@ export function DiaryForm({
         />
       </div>
 
-      <Button
-        type="primary"
-        block
-        loading={saving}
-        disabled={saving}
-        htmlType="button"
-        onClick={handleSubmit}
-      >
-        保存
-      </Button>
+      <motion.div whileTap={{ scale: 0.96 }} transition={{ duration: 0.1 }}>
+        <Button
+          type="primary"
+          block
+          loading={saving}
+          disabled={saving}
+          htmlType="button"
+          onClick={handleSubmit}
+        >
+          保存
+        </Button>
+      </motion.div>
     </div>
   );
 }
