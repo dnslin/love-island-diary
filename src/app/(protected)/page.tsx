@@ -36,7 +36,7 @@ export default async function Home() {
   const formattedDate = dayjs(profile.anniversaryDate).format('YYYY.MM.DD');
 
   return (
-    <div className="min-h-screen bg-cream px-4 relative">
+    <div className="min-h-screen bg-cream px-4 relative overflow-x-hidden">
       <div className="mx-auto max-w-[480px] min-h-screen relative">
         {/* 设置按钮 — 仅 admin 可见 */}
         {role === 'admin' && (
