@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ScaleIn } from './animations';
 
 interface PasswordModalProps {
   isOpen: boolean;
@@ -31,7 +32,8 @@ export default function PasswordModal({
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm'>
-      <div className='w-full max-w-[320px] mx-4 bg-card rounded-2xl border border-border-soft shadow-lg p-6'>
+      <ScaleIn>
+        <div className='w-full max-w-[320px] mx-4 bg-card rounded-2xl border border-border-soft shadow-lg p-6'>
         <div className='flex items-center justify-between mb-4'>
           <div className='flex items-center gap-2'>
             <svg
@@ -94,6 +96,7 @@ export default function PasswordModal({
           </button>
         </form>
       </div>
-    </div>
+    </ScaleIn>
+  </div>
   );
 }
