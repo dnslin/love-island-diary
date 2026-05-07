@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import FloatingButton from './FloatingButton';
 import ViewPasswordModal from './ViewPasswordModal';
 
@@ -32,6 +33,12 @@ export default function CoverActions({ isAuthenticated, href, showWriteButton }:
         >
           翻开日记
         </button>
+        <Link
+          href="/memories"
+          className="text-sm text-text-sub hover:text-text-main transition-colors"
+        >
+          回忆照片墙
+        </Link>
         {showWriteButton && (
           <FloatingButton href='/diary/new'>写下今天</FloatingButton>
         )}
