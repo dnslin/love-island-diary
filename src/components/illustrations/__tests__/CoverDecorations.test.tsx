@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import CoverDecorations from '../CoverDecorations'
+import { CoverDecorations } from '../CoverDecorations'
 
 describe('CoverDecorations', () => {
   it('renders 8 svg elements', () => {
