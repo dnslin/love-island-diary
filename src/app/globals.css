@@ -56,15 +56,11 @@ textarea:focus {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
 /* 封面页小屏高度适配 */
 @media (max-height: 700px) {
   /* 预留微调空间，供 cover 页面覆盖使用 */
-}
-input:focus,
-textarea:focus {
-  border-color: #ffcc00 !important;
-  outline: none;
 }
