@@ -165,6 +165,15 @@ export async function getCoverStats() {
   return { diaryCount, memoryCount };
 }
 
+export async function getAllDiaryImages() {
+  return prisma.diaryImage.findMany({
+    orderBy: {
+      entry: { date: 'desc' },
+    },
+    include: { entry: { select: { id: true, date: true } } },
+  });
+}
+
 export type SettingsFormState = {
   ok: boolean;
   fieldErrors?: Partial<

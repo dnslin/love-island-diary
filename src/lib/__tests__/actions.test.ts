@@ -10,6 +10,7 @@ import {
   updateCoupleProfile,
   getCoverStats,
   saveCoupleProfileAction,
+  getAllDiaryImages,
 } from '../actions';
 import dayjs from 'dayjs';
 
@@ -360,5 +361,39 @@ describe('saveCoupleProfileAction', () => {
 
     const profile = await prisma.coupleProfile.findFirst();
     expect(profile?.siteTitle).toBeNull();
+  });
+});
+
+describe('getAllDiaryImages', () => {
+  test('返回所有图片并按日记日期倒序排列', async () => {
+    const entry1 = await createDiary({
+      date: new Date('2025-01-15'),
+      title: '第一次约会',
+      content: '内容1',
+      mood: 'happy',
+      images: ['https://example.com/photo1.jpg'],
+    });
+
+    const entry2 = await createDiary({
+      date: new Date('2025-02-20'),
+      title: '情人节',
+      content: '内容2',
+      mood: 'sweet',
+      images: ['https://example.com/photo2.jpg', 'https://example.com/photo3.jpg'],
+    });
+
+    const images = await getAllDiaryImages();
+
+    expect(images).toHaveLength(3);
+    // 按日期倒序：entry2 的图片在前
+    expect(images[0].entryId).toBe(entry2.id);
+    expect(images[1].entryId).toBe(entry2.id);
+    expect(images[2].entryId).toBe(entry1.id);
+    expect(images[0].url).toBe('https://example.com/photo2.jpg');
+  });
+
+  test('空数据时返回空数组', async () => {
+    const images = await getAllDiaryImages();
+    expect(images).toEqual([]);
   });
 });
