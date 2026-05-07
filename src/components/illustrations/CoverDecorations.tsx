@@ -1,4 +1,4 @@
-export default function CoverDecorations() {
+export function CoverDecorations() {
   return (
     <>
       <style>{`

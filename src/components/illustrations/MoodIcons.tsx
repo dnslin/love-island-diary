@@ -12,7 +12,7 @@ const moodLabels: Record<MoodIconsProps['mood'], string> = {
   sad: '小难过',
 }
 
-export default function MoodIcons({ mood, size = 20, className = '' }: MoodIconsProps) {
+export function MoodIcon({ mood, size = 20, className = '' }: MoodIconsProps) {
   const label = moodLabels[mood]
   const s = size
   const half = s / 2
