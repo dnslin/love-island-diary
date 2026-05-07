@@ -55,7 +55,7 @@ describe('useReducedMotion', () => {
 
     // 在 jsdom 中，globalThis.window = undefined 不会立即让函数内的 typeof window 变为 'undefined'
     // 因为 jsdom 的 window 对象仍通过全局作用域可达。这里直接模拟 matchMedia 为 undefined 来验证 SSR 行为。
-    // @ts-expect-error
+    // @ts-expect-error 模拟 matchMedia 不存在
     globalThis.matchMedia = undefined
 
     const { result } = renderHook(() => useReducedMotion())
@@ -66,7 +66,7 @@ describe('useReducedMotion', () => {
   })
 
   test('监听 matchMedia 变化并更新状态', () => {
-    const mql = mockMatchMedia(false)
+    mockMatchMedia(false)
     const { result } = renderHook(() => useReducedMotion())
     expect(result.current).toBe(false)
 

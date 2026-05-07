@@ -14,11 +14,11 @@ interface SlideInProps {
   className?: string
 }
 
-const directionOffset: Record<Direction, { x?: number; y?: number }> = {
-  top: { y: -20 },
-  bottom: { y: 20 },
-  left: { x: -20 },
-  right: { x: 20 },
+const directionOffset: Record<Direction, { x?: number; y?: number; opacity?: number }> = {
+  top: { y: -20, opacity: 0 },
+  bottom: { y: 20, opacity: 0 },
+  left: { x: -20, opacity: 0 },
+  right: { x: 20, opacity: 0 },
 }
 
 export function SlideIn({
