@@ -3,7 +3,7 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import { DiaryNavigation } from './DiaryNavigation';
 
 type Direction = 'left' | 'right';
@@ -58,24 +58,16 @@ export function PageFlipWrapper({
     }
   }, []);
 
-  const prefersReducedMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   const handleExitComplete = useCallback(() => {
     const dir = directionRef.current;
     if (!dir) return;
     const targetId = dir === 'right' ? nextId : prevId;
     if (targetId) {
-      if (prefersReducedMotion) {
-        router.push(`/diary/${targetId}`);
-      } else {
-        sessionStorage.setItem('pageFlipDirection', dir);
-        router.push(`/diary/${targetId}`);
-      }
+      sessionStorage.setItem('pageFlipDirection', dir);
+      router.push(`/diary/${targetId}`);
     }
     directionRef.current = null;
-  }, [prevId, nextId, router, prefersReducedMotion]);
+  }, [prevId, nextId, router]);
 
   const goToPrev = useCallback(() => {
     if (isExiting || prevId === null) return;
@@ -198,27 +190,29 @@ export function PageFlipWrapper({
           className="mb-6"
           style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
         >
-          <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
-            {!isExiting && (
-              <motion.div
-                key={currentId}
-                custom={direction}
-                variants={variants}
-                initial={direction ? 'enter' : false}
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.4, ease: 'easeInOut' }}
-                style={{
-                  transformStyle: 'preserve-3d',
-                  backfaceVisibility: 'hidden',
-                }}
-              >
-                <div className="bg-card rounded-2xl p-4 shadow-sm">
-                  {children}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <MotionConfig reducedMotion="user">
+            <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
+              {!isExiting && (
+                <motion.div
+                  key={currentId}
+                  custom={direction}
+                  variants={variants}
+                  initial={direction ? 'enter' : false}
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    backfaceVisibility: 'hidden',
+                  }}
+                >
+                  <div className="bg-card rounded-2xl p-4 shadow-sm">
+                    {children}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </MotionConfig>
         </div>
 
         {/* 底部导航 */}
