@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import type { DiaryEntry, DiaryImage } from '@prisma/client';
+import { MoodIcon } from './illustrations';
 
 interface DiaryDetailProps {
   entry: DiaryEntry & { images: DiaryImage[] };
@@ -31,10 +32,7 @@ export function DiaryDetail({ entry, entryNumber }: DiaryDetailProps) {
             className="flex items-center gap-1 px-2 py-0.5 rounded-full"
             style={{ backgroundColor: mood.color + '33' }}
           >
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: mood.color }}
-            />
+            <MoodIcon mood={entry.mood as 'sweet' | 'happy' | 'miss' | 'calm' | 'sad'} size={16} />
             {mood.label}
           </span>
         </div>
