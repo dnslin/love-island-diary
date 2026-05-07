@@ -208,6 +208,7 @@ export function PageFlipWrapper({
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.4, ease: 'easeInOut' }}
+                reducedMotion="user"
                 style={{
                   transformStyle: 'preserve-3d',
                   backfaceVisibility: 'hidden',
