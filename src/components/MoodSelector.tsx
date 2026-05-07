@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MoodIcon } from './illustrations';
+import { useReducedMotion } from './animations';
 
 export const MOODS = [
   { value: 'sweet', label: '甜甜的', color: '#F7C8D0' },
@@ -23,6 +24,7 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const selected = MOODS.find((m) => m.value === value) ?? MOODS[0];
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -54,19 +56,25 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
         whileTap={{ scale: 0.96 }}
         transition={{ duration: 0.1 }}
       >
-        <motion.span
-          animate={{ scale: 1.3 }}
-          transition={{
-            type: 'spring',
-            stiffness: 300,
-            damping: 10,
-            repeat: 1,
-            repeatType: 'reverse',
-          }}
-          key={selected.value}
-        >
-          <MoodIcon mood={selected.value} size={16} />
-        </motion.span>
+        {reducedMotion ? (
+          <span key={selected.value}>
+            <MoodIcon mood={selected.value} size={16} />
+          </span>
+        ) : (
+          <motion.span
+            animate={{ scale: 1.3 }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 10,
+              repeat: 1,
+              repeatType: 'reverse',
+            }}
+            key={selected.value}
+          >
+            <MoodIcon mood={selected.value} size={16} />
+          </motion.span>
+        )}
         <span className="text-sm text-text-main">{selected.label}</span>
       </motion.button>
 
@@ -92,9 +100,13 @@ export function MoodSelector({ value, onChange }: MoodSelectorProps) {
                 }}
                 className="flex items-center gap-2 w-full px-3 py-2 hover:bg-cream text-left"
               >
-                <motion.span whileTap={{ scale: 0.8 }} transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
-                  <MoodIcon mood={mood.value} size={16} />
-                </motion.span>
+                {reducedMotion ? (
+                  <span><MoodIcon mood={mood.value} size={16} /></span>
+                ) : (
+                  <motion.span whileTap={{ scale: 0.8 }} transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
+                    <MoodIcon mood={mood.value} size={16} />
+                  </motion.span>
+                )}
                 <span className="text-sm text-text-main">{mood.label}</span>
               </button>
             ))}

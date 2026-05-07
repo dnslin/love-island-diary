@@ -32,6 +32,7 @@ export function MoodIcon({ mood, size = 20, className = '' }: MoodIconsProps) {
         cy={half}
         r={half - 1}
         fill="none"
+        stroke="#8A7C78"
         strokeWidth={1.2}
         strokeLinecap="round"
         strokeLinejoin="round"
