@@ -40,7 +40,16 @@ export default async function DiaryPage() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <BackButton />
-            <h1 className="text-lg font-bold text-text-main">目录</h1>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-bold text-text-main">时间线</span>
+              <span className="text-border-soft">|</span>
+              <Link
+                href="/calendar"
+                className="text-sm text-text-sub hover:text-text-main transition-colors"
+              >
+                日历
+              </Link>
+            </div>
           </div>
           <Link
             href="/memories"
