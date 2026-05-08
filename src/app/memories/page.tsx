@@ -22,6 +22,7 @@ export default async function MemoriesPage() {
               id: img.id,
               url: img.url,
               entryId: img.entryId,
+              title: img.entry.title,
             }))}
           />
         )}

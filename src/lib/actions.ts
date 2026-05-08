@@ -170,7 +170,7 @@ export async function getAllDiaryImages() {
     orderBy: {
       entry: { date: 'desc' },
     },
-    include: { entry: { select: { id: true, date: true } } },
+    include: { entry: { select: { id: true, date: true, title: true } } },
   });
 }
 

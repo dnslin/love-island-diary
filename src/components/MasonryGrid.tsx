@@ -8,6 +8,7 @@ interface ImageItem {
   id: string;
   url: string;
   entryId: string;
+  title: string | null;
 }
 
 interface MasonryGridProps {
