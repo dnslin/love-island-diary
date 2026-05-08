@@ -174,6 +174,32 @@ export async function getAllDiaryImages() {
   });
 }
 
+export async function getDiaryDatesInMonth(year: number, month: number) {
+  const start = dayjs().year(year).month(month - 1).startOf('month').toDate();
+  const end = dayjs().year(year).month(month - 1).endOf('month').toDate();
+
+  const entries = await prisma.diaryEntry.findMany({
+    where: {
+      date: { gte: start, lte: end },
+    },
+    orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    select: { id: true, date: true, title: true },
+  });
+
+  const groups = new Map<string, typeof entries>();
+  for (const entry of entries) {
+    const key = dayjs(entry.date).format('YYYY-MM-DD');
+    const arr = groups.get(key);
+    if (arr) arr.push(entry);
+    else groups.set(key, [entry]);
+  }
+
+  return Array.from(groups.entries()).map(([date, items]) => ({
+    date,
+    entries: items,
+  }));
+}
+
 export type SettingsFormState = {
   ok: boolean;
   fieldErrors?: Partial<
