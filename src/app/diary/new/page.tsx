@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { DiaryForm } from '@/components/DiaryForm';
 import { getAuthRole } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: '写下今天',
 };

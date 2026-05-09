@@ -7,6 +7,8 @@ import { BackButton } from '@/components/BackButton';
 import dayjs from '@/lib/dayjs';
 import type { DiaryEntry, DiaryImage } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: '目录',
 };

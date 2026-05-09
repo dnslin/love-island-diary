@@ -5,6 +5,8 @@ import { BackButton } from '@/components/BackButton';
 import { CalendarGrid } from '@/components/CalendarGrid';
 import dayjs from '@/lib/dayjs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: '日历',
 };

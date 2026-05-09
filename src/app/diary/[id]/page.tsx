@@ -6,6 +6,8 @@ import { getAuthRole } from '@/lib/auth';
 import { PageFlipWrapper } from '@/components/PageFlipWrapper';
 import { DiaryDetail } from '@/components/DiaryDetail';
 
+export const dynamic = 'force-dynamic';
+
 interface DiaryDetailPageProps {
   params: Promise<{ id: string }>;
 }

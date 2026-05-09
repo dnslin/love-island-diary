@@ -3,6 +3,8 @@ import { getAllDiaryImages } from '@/lib/actions';
 import { MasonryGrid } from '@/components/MasonryGrid';
 import { EmptyMemories } from '@/components/EmptyMemories';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: '回忆照片墙',
 };

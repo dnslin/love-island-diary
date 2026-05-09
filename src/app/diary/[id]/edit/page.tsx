@@ -6,6 +6,8 @@ import { DeleteDiarySection } from '@/components/DeleteDiarySection';
 import { getDiaryById } from '@/lib/actions';
 import { getAuthRole } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({
   params,
 }: {
