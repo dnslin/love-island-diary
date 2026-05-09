@@ -6,8 +6,8 @@ RUN apk add --no-cache python3 make g++ gcc
 
 WORKDIR /app
 
-# 启用 corepack 以使用 pnpm（Node.js 内置）
-RUN corepack enable
+# 启用 corepack 并固定 pnpm 版本（避免 v11 默认禁止构建脚本的问题）
+RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
 
 # 先复制依赖清单，利用 Docker 缓存层
 COPY package.json pnpm-lock.yaml ./
