@@ -9,6 +9,9 @@ WORKDIR /app
 # 启用 corepack 以使用 pnpm（Node.js 内置）
 RUN corepack enable
 
+# 允许依赖包运行构建脚本（better-sqlite3、prisma 等需要编译原生模块）
+RUN pnpm config set ignore-build-scripts false
+
 # 先复制依赖清单，利用 Docker 缓存层
 COPY package.json pnpm-lock.yaml ./
 COPY prisma/schema.prisma ./prisma/
