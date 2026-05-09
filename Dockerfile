@@ -1,5 +1,5 @@
 # ---------- builder 阶段 ----------
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # 安装 better-sqlite3 编译所需的构建工具
 RUN apk add --no-cache python3 make g++ gcc
@@ -27,7 +27,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
 
 # ---------- runner 阶段 ----------
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
