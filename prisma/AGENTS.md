@@ -1,14 +1,20 @@
 # PRISMA KNOWLEDGE BASE
 
-**Scope:** `prisma/` — Database schema, migrations, and SQLite configuration.
+**Scope:** `prisma/` — Database schema, migrations, seed data, and SQLite configuration.
 
 ## STRUCTURE
 
 ```
 schema.prisma           # Prisma schema (sqlite provider, no url field)
 dev.db                  # Development SQLite database
+seed.ts                 # Seed script for development data
 migrations/             # Prisma migration files
 migration_lock.toml     # Auto-generated — do not edit manually
+```
+
+**Project root also has:**
+```
+prisma.config.ts        # Prisma config (new format): schema path, migrations path, datasource url
 ```
 
 ## CRITICAL: DRIVER ADAPTER PATTERN
@@ -22,12 +28,13 @@ This project uses Prisma's **Driver Adapter** for `better-sqlite3` instead of th
   const adapter = new PrismaBetterSqlite3({ url });
   ```
 - **Docker** mounts `./data:/data` and sets `DATABASE_URL=file:/data/love-diary.db`.
+- **`prisma.config.ts`** at project root uses the new Prisma config format.
 
 ## CONVENTIONS
 
 - Run `npx prisma migrate dev` after schema changes.
 - Run `npx prisma generate` to regenerate the client (also done in Dockerfile).
-- `prisma.config.ts` at project root uses the new Prisma config format.
+- Run `npx prisma db seed` to execute `prisma/seed.ts`.
 
 ## ANTI-PATTERNS
 
