@@ -10,7 +10,7 @@ WORKDIR /app
 RUN corepack enable
 
 # 允许依赖包运行构建脚本（better-sqlite3、prisma 等需要编译原生模块）
-RUN pnpm config set ignore-build-scripts false
+RUN echo "ignore-build-scripts=false" > .npmrc
 
 # 先复制依赖清单，利用 Docker 缓存层
 COPY package.json pnpm-lock.yaml ./
