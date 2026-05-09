@@ -62,4 +62,28 @@ describe('CalendarGrid', () => {
     const dayButton = screen.getByText('15').closest('button');
     expect(dayButton).toBeDisabled();
   });
+
+  test('点击有多篇日记的日期弹出浮层而非跳转', () => {
+    render(
+      <CalendarGrid
+        year={2025}
+        month={5}
+        diaryDays={[
+          {
+            date: '2025-05-08',
+            entries: [
+              { id: 'entry-a', title: '日记A' },
+              { id: 'entry-b', title: '日记B' },
+            ],
+          },
+        ]}
+      />
+    );
+    const dayButton = screen.getByText('8').closest('button');
+    fireEvent.click(dayButton!);
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(screen.getByText('5月8日的日记')).toBeInTheDocument();
+    expect(screen.getByText('日记A')).toBeInTheDocument();
+    expect(screen.getByText('日记B')).toBeInTheDocument();
+  });
 });

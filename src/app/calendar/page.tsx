@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getDiaryDatesInMonth } from '@/lib/actions';
-import { getAuthRole } from '@/lib/auth';
 import { BackButton } from '@/components/BackButton';
 import { CalendarGrid } from '@/components/CalendarGrid';
 import dayjs from '@/lib/dayjs';
@@ -24,15 +23,12 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
   const year = currentMonth.year();
   const monthNum = currentMonth.month() + 1;
 
-  const [diaryDays] = await Promise.all([
-    getDiaryDatesInMonth(year, monthNum),
-    getAuthRole(),
-  ]);
+  const diaryDays = await getDiaryDatesInMonth(year, monthNum);
 
   const prevMonth = currentMonth.subtract(1, 'month').format('YYYY-MM');
   const nextMonth = currentMonth.add(1, 'month').format('YYYY-MM');
   const monthLabel = currentMonth.format('YYYY年M月');
-  const diaryCount = diaryDays.reduce((sum, d) => sum + d.entries.length, 0);
+  const diaryDayCount = diaryDays.length;
 
   return (
     <main className="min-h-screen bg-cream">
@@ -104,8 +100,8 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
             </div>
           </div>
           <p className="text-sm text-text-sub">
-            {diaryCount > 0
-              ? `这个月，我们记录了 ${diaryCount} 天。`
+            {diaryDayCount > 0
+              ? `这个月，我们记录了 ${diaryDayCount} 天。`
               : '这个月还没有记录。'}
           </p>
         </div>

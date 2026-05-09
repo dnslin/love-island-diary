@@ -175,8 +175,8 @@ export async function getAllDiaryImages() {
 }
 
 export async function getDiaryDatesInMonth(year: number, month: number) {
-  const start = dayjs().year(year).month(month - 1).startOf('month').toDate();
-  const end = dayjs().year(year).month(month - 1).endOf('month').toDate();
+  const start = dayjs(`${year}-${String(month).padStart(2, '0')}-01`).startOf('month').toDate();
+  const end = dayjs(`${year}-${String(month).padStart(2, '0')}-01`).endOf('month').toDate();
 
   const entries = await prisma.diaryEntry.findMany({
     where: {

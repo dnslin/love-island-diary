@@ -14,12 +14,11 @@ jest.mock('next/navigation', () => ({
   },
 }));
 
-beforeEach(async () => {
-  await prisma.diaryImage.deleteMany();
-  await prisma.diaryEntry.deleteMany();
-});
-
 describe('getDiaryDatesInMonth', () => {
+  beforeEach(async () => {
+    await prisma.diaryImage.deleteMany();
+    await prisma.diaryEntry.deleteMany();
+  });
   test('返回当月有日记的日期分组，按日期和创建时间升序', async () => {
     await createDiary({ date: new Date('2025-05-15'), title: '日记2', content: '内容2' });
     await createDiary({ date: new Date('2025-05-08'), title: '日记1', content: '内容1' });
